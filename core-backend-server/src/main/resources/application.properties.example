@@ -1,0 +1,39 @@
+spring.application.name=sals
+
+# ===============================
+# 1. SERVER CONFIGURATION
+# ===============================
+server.port=8080
+
+# ===============================
+# 2. MYSQL CONFIGURATION (Primary DB)
+# Used for: Users, Attendance Records, Class Sessions, Auth
+# ===============================
+spring.datasource.url=jdbc:mysql://localhost:3306/your_db?allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC
+spring.datasource.username=root
+spring.datasource.password=****
+spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
+
+# JPA / Hibernate Settings
+# 'update' automatically creates/modifies tables based on your Entity classes
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.show-sql=true
+spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.MySQLDialect
+
+
+
+# ===============================
+# 3. MONGODB CONFIGURATION (Secondary DB)
+# Used for: Fetching AI-generated Learning Paths & Analytics
+# ===============================
+
+#spring.data.mongodb.uri=mongodb://user_name:pass123@localhost:27017/your_db?authSource=admin_db
+
+
+
+# ===============================
+# 4. APP CUSTOM CONFIGURATION
+# ===============================
+# Secret key for JWT (Make this long and secure for production)
+app.jwt.secret=53675a6B5970837336763y792F423F4528482B4D625v655s68576D5A71347437
+app.jwt.expiration-ms=7640000
