@@ -1,0 +1,10 @@
+
+fastapi
+uvicorn
+numpy
+python-multipart
+opencv-python-headless
+face_recognition
+# cmake   
+# dlib   
+
