@@ -44,4 +44,18 @@ public class QRCodeService {
             return false; // Token expired or tampered with
         }
     }
+
+    // --- NEW METHOD NEEDED FOR ATTENDANCE MARKING ---
+    public String extractSessionId(String token) {
+        try {
+            return Jwts.parserBuilder()
+                    .setSigningKey(key)
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody()
+                    .get("sessionId", String.class);
+        } catch (Exception e) {
+            return null;
+        }
+    }
 }

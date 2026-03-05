@@ -1,15 +1,9 @@
+
 package com.core_server.sals.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
 import java.time.LocalDateTime;
-
-/**
- * DESCRIPTION:
- * This entity represents a live class session.
- * It links a specific Subject (e.g., "Data Structures") to a Teacher
- * and generates a unique 'sessionCode' for that specific hour.
- */
 
 @Entity
 @Data
@@ -20,14 +14,32 @@ public class ClassSession {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String subjectName;
-    private String teacherId; // Keeping it simple as String for now
-
-    // The unique code for this specific class hour (e.g., "CS101-170845...")
-    // This helps group all attendance records for this specific lecture.
     @Column(unique = true)
-    private String sessionIdentifier;
+    private String sessionIdentifier; // e.g., "CS101-1708..."
+
+    // --- Relationship ---
+    @ManyToOne
+    @JoinColumn(name = "subject_id")
+    private Subject subject;
+
+    //change - 1
+    @Column(name = "is_makeup")
+    private boolean isMakeup;
+
+
+    @Column(name = "is_valid_schedule")
+    private Boolean isValidSchedule = true;
+
+    private String teacherId;
 
     private LocalDateTime startTime;
-    private boolean isActive;
+
+    private boolean active;
+
+    private LocalDateTime createdAt;
+    private LocalDateTime expiresAt;
+
+    private double latitude;
+    private double longitude;
+    private double radius;
 }

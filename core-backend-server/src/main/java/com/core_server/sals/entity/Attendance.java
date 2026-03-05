@@ -1,3 +1,5 @@
+
+
 package com.core_server.sals.entity;
 
 import jakarta.persistence.*;
@@ -14,7 +16,11 @@ public class Attendance {
     private Long id;
 
     private String studentId;
-    private String sessionId;
+
+
+    @ManyToOne
+    @JoinColumn(name = "session_id")
+    private ClassSession session;
 
     private LocalDateTime timestamp;
 
@@ -22,11 +28,12 @@ public class Attendance {
     private double longitude;
 
     @Enumerated(EnumType.STRING)
-    private AttendanceStatus status; // PRESENT, REJECTED_FAR, REJECTED_PROXY
+    private AttendanceStatus status;
 
     public enum AttendanceStatus {
         PRESENT,
         REJECTED_DISTANCE,
-        REJECTED_TIMEOUT
+        REJECTED_TIMEOUT,
+        REJECTED_PROXY
     }
 }

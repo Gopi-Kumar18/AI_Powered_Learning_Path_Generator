@@ -47,5 +47,19 @@ public class DataSeeder implements CommandLineRunner {
             userRepository.save(student);
             System.out.println("✅ [SEEDER] Student Created: student@sals.com / pass123");
         }
+
+        // Student - 2
+        if (userRepository.findByCustomId("12208232").isEmpty()) {
+            User student = new User(
+                    null,                   // ID (Auto)
+                    "12208232",              // Custom ID (Must match your 'known_faces' file!)
+                    "student1@sals.com",     // Email
+                    pe.encode("pass123"), // Password
+                    "STUDENT",              // Role
+                    "Mohit Kumar"            // Name
+            );
+            userRepository.save(student);
+            System.out.println("✅ [SEEDER] Student Created: student@sals.com / pass123");
+        }
     }
 }
