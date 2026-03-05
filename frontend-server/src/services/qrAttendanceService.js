@@ -28,9 +28,7 @@ import axios from 'axios';
 // });
 
 
-// const API_URL = 'http://localhost:8080/api/attendance';     //localhost
-
-const API_URL = 'https://7fdblmk4-8080.inc1.devtunnels.ms/api/attendance';  // private IP (LAN)
+const API_URL = 'http://localhost:8080/api/attendance';     //localhost
 
 
 
@@ -39,19 +37,20 @@ const API_URL = 'https://7fdblmk4-8080.inc1.devtunnels.ms/api/attendance';  // p
  * 1. Start a New Class Session
  * payload: { subject: "Data Structures", batch: "2024-A" }
  */
-export const startSession = async (sessionData) => {
+
+export const startSession = async (subject, batch) => {
   try {
-    const TEACHER_TOKEN = localStorage.getItem("token");
-    const response = await axios.post(`${API_URL}/create-session`, sessionData, {
-      headers: { Authorization: `Bearer ${TEACHER_TOKEN}` }
+    // This calls the exact endpoint you tested in Postman
+    const response = await axios.post(`${API_URL}/create-session`, {
+      subject: subject,
+      batch: batch
     });
-    return response.data; // Returns sessionId
+    return response.data; // Returns { sessionId: "DATASTRUCTURES-177..." }
   } catch (error) {
-    console.error("Error starting session:", error);
-    throw error;
+    console.error("Failed to create session", error);
+    return null;
   }
 };
-
 
 export const getQrToken = async (sessionId) => {
   try {

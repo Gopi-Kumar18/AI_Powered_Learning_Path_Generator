@@ -25,8 +25,7 @@ const LoginPage = () => {
     setIsLoading(true);
 
     try {
-      const response = await fetch("https://7fdblmk4-8080.inc1.devtunnels.ms/api/auth/login", {
-    //  const response = await fetch("http://localhost:8080/api/auth/login", {
+     const response = await fetch("http://localhost:8080/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ userId, password }),

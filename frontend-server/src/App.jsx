@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import TeacherDashboard from './pages/TeacherDashboard';
-import StudentScanner from './components/student/StudentScanner';
+import StudentDashboard from './pages/StudentDashboard';
+// import StudentScanner from './components/student/StudentScanner';
 import { AuthProvider, useAuth } from "./context/AuthContext";
 import LoginPage from "./pages/LoginPage";
 
@@ -42,7 +43,7 @@ function App() {
             path="/studentDashboard" 
             element={
               <ProtectedRoute allowedRole="STUDENT">
-                <StudentScanner />
+                <StudentDashboard />
               </ProtectedRoute>
             } 
           />
