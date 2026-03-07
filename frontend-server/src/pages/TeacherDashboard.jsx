@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { FaChalkboardTeacher, FaChartPie, FaHistory, FaUserGraduate, FaSignOutAlt, FaArrowLeft } from 'react-icons/fa';
 import CreateSession from '../components/teacher/CreateSession'; // Ensure path is correct based on your folder structure
-import LiveQR from '../components/teacher/LiveQR';             // Ensure path is correct
+import LiveQR from '../components/teacher/LiveQR';             
+import LiveSessionMonitor from '../components/teacher/LiveSessionMonitor'; // New component for live monitoring
 
 const TeacherDashboard = () => {
   const [view, setView] = useState('dashboard'); // 'dashboard', 'create', 'live'
@@ -133,7 +134,14 @@ const TeacherDashboard = () => {
                   <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span> Live
                 </span>
              </div>
-             <LiveQR sessionId={activeSessionId} />
+             
+             <div className="grid grid-cols-1 lg:grid-cols-1.3 gap-8 items-start">
+                 <LiveQR sessionId={activeSessionId} />
+                 <div className="h-[500px]"> {/* Forces monitor to match QR height */}
+                     <LiveSessionMonitor sessionId={activeSessionId} />
+                 </div>
+             </div>
+
           </div>
         )}
 

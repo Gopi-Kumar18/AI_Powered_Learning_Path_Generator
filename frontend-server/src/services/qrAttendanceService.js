@@ -28,7 +28,9 @@ import axios from 'axios';
 // });
 
 
-const API_URL = 'http://localhost:8080/api/attendance';     //localhost
+// const API_URL = 'http://localhost:8080/api/attendance';     //localhost
+
+const API_URL = 'https://7fdblmk4-8080.inc1.devtunnels.ms/api/attendance'; 
 
 
 
@@ -97,6 +99,22 @@ export const markAttendance = async (formData) => {
         return { status: "ERROR", message: error.response.data.message || "Server Error" };
     }
     return { status: "ERROR", message: "Network Error" };
+  }
+};
+
+
+// -------- View Attendance Real Time Logs on teacher dashboard --------
+
+export const getLiveSessionLogs = async (sessionId) => {
+  try {
+    const token = localStorage.getItem('token');
+    const response = await axios.get(`https://7fdblmk4-8080.inc1.devtunnels.ms/api/teacher/session-logs/${sessionId}`, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Failed to fetch live logs", error);
+    return { totalPresent: 0, logs: [] };
   }
 };
 

@@ -34,7 +34,8 @@ const StudentDashboard = () => {
     const fetchStats = async () => {
       try {
         const token = localStorage.getItem('token');
-        const res = await axios.get(`http://localhost:8080/api/student/stats/${user.userId}`, {
+      //   const res = await axios.get(`http://localhost:8080/api/student/stats/${user.userId}`, {
+      const res = await axios.get(`https://7fdblmk4-8080.inc1.devtunnels.ms/api/student/stats/${user.userId}`, {
             headers: { Authorization: `Bearer ${token}` }
         });
         setDashboardData(res.data);
