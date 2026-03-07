@@ -40,7 +40,7 @@ public class SecurityConfig {
 
                 .authorizeHttpRequests(auth -> auth
                         // Allow these specific endpoints without login
-                        .requestMatchers("/api/auth/**", "/api/attendance/**").permitAll()
+                        .requestMatchers("/api/auth/**", "/api/attendance/**", "/api/teacher/**").permitAll()
                         // Lock everything else
                         .anyRequest().authenticated()
                 )

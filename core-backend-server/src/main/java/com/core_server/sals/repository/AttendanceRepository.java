@@ -20,4 +20,7 @@ public interface AttendanceRepository extends JpaRepository<Attendance, Long> {
     List<Attendance> findByStudentIdAndTimestampBetweenOrderByTimestampDesc(String studentId, LocalDateTime startOfDay, LocalDateTime endOfDay);
 
     boolean existsByStudentIdAndSession(String studentId, ClassSession session);
+
+    // Fetch all attendance logs for a specific live session
+    List<Attendance> findBySession_SessionIdentifierOrderByTimestampDesc(String sessionIdentifier);
 }
