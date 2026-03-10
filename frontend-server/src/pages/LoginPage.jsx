@@ -6,10 +6,10 @@ import { FaUserShield, FaSpinner } from "react-icons/fa";
 const LoginPage = () => {
 
   //   // 1. ADD THIS TEMPORARY EFFECT
-  useEffect(() => {
-    console.log("Cleaning old tokens...");
-    localStorage.clear(); // Wipes the bad token
-  }, []);
+  // useEffect(() => {
+  //   console.log("Cleaning old tokens...");
+  //   localStorage.clear(); // Wipes the bad token
+  // }, []);
   
   const [userId, setUserId] = useState("");
   const [password, setPassword] = useState("");
@@ -41,8 +41,10 @@ const LoginPage = () => {
         // 3. Redirect based on Role
         if (data.role === "TEACHER") {
           navigate("/teacherDashboard");
-        } else {
+        } else if (data.role === "STUDENT") {
           navigate("/studentDashboard");
+        } else if (data.role === "ADMIN") {
+          navigate("/adminDashboard");
         }
       } else {
         setError("Invalid credentials. Please try again.");

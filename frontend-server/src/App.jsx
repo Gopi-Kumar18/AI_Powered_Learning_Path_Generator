@@ -4,6 +4,7 @@ import StudentDashboard from './pages/StudentDashboard';
 // import StudentScanner from './components/student/StudentScanner';
 import { AuthProvider, useAuth } from "./context/AuthContext";
 import LoginPage from "./pages/LoginPage";
+import AdminDashboard from './components/admin/AdminDashBoard';
 
 const ProtectedRoute = ({ children, allowedRole }) => {
   const { user } = useAuth();
@@ -44,6 +45,17 @@ function App() {
             element={
               <ProtectedRoute allowedRole="STUDENT">
                 <StudentDashboard />
+              </ProtectedRoute>
+            } 
+          />
+
+
+          {/* Admin Only Route */}
+          <Route 
+            path="/adminDashboard" 
+            element={
+              <ProtectedRoute allowedRole="ADMIN">
+                <AdminDashboard />
               </ProtectedRoute>
             } 
           />
