@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import java.time.LocalDateTime;
+import java.util.List;
 
 public interface ClassSessionRepository extends JpaRepository<ClassSession, Long> {
 
@@ -24,4 +25,7 @@ public interface ClassSessionRepository extends JpaRepository<ClassSession, Long
     // For Controller: Count how many legitimate classes happened today for Makeup logic
     @Query("SELECT COUNT(s) FROM ClassSession s WHERE s.subject.id = :subjectId AND s.isValidSchedule = true AND s.createdAt BETWEEN :start AND :end")
     long countTodayValidSessions(@Param("subjectId") Long subjectId, @Param("start") LocalDateTime start, @Param("end") LocalDateTime end);
+
+    // Fetch all sessions created by a specific teacher, ordered from newest to oldest.
+    List<ClassSession> findByTeacherIdOrderByCreatedAtDesc(String teacherId);
 }

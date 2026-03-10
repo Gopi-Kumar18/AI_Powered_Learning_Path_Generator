@@ -23,4 +23,12 @@ public interface AttendanceRepository extends JpaRepository<Attendance, Long> {
 
     // Fetch all attendance logs for a specific live session
     List<Attendance> findBySession_SessionIdentifierOrderByTimestampDesc(String sessionIdentifier);
+
+    // Quickly count how many students attended a specific session
+    long countBySession_Id(Long sessionId);
+
+
+    // --- FEATURE 7: Fetch grouped student stats for a specific teacher ---
+    @Query("SELECT a.studentId, COUNT(a.id), MAX(a.timestamp) FROM Attendance a WHERE a.session.teacherId = :teacherId GROUP BY a.studentId")
+    List<Object[]> findStudentStatsForTeacher(@Param("teacherId") String teacherId);
 }
