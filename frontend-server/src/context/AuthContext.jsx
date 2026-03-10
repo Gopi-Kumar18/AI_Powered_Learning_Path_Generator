@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect } from "react";
 
+
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
@@ -29,10 +30,11 @@ export const AuthProvider = ({ children }) => {
     setUser(userData);
   };
 
+
   const logout = () => {
     localStorage.clear();
     setUser(null);
-    window.location.href = "/"; 
+    window.location.href("/");
   };
 
   return (

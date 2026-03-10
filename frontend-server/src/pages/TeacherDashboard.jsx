@@ -1,8 +1,11 @@
 import { useState } from 'react';
 import { FaChalkboardTeacher, FaChartPie, FaHistory, FaUserGraduate, FaSignOutAlt, FaArrowLeft } from 'react-icons/fa';
-import CreateSession from '../components/teacher/CreateSession'; // Ensure path is correct based on your folder structure
+import CreateSession from '../components/teacher/CreateSession'; 
+import SessionHistory from '../components/teacher/SessionHistory';
 import LiveQR from '../components/teacher/LiveQR';             
-import LiveSessionMonitor from '../components/teacher/LiveSessionMonitor'; // New component for live monitoring
+import LiveSessionMonitor from '../components/teacher/LiveSessionMonitor'; 
+import TeacherAnalytics from '../components/teacher/TeacherAnalytics';
+import ManageStudents from '../components/teacher/ManageStudents';
 
 const TeacherDashboard = () => {
   const [view, setView] = useState('dashboard'); // 'dashboard', 'create', 'live'
@@ -11,9 +14,11 @@ const TeacherDashboard = () => {
 
   // Helper to handle feature clicks
   const handleFeatureClick = (feature) => {
-    if (feature === 'start_session') {
-      setView('create');
-    } else {
+    if (feature === 'start_session')  setView('create'); 
+    else if (feature === 'History') setView('history'); 
+    else if (feature === 'Analytics') setView('analytics');
+    else if (feature === 'Students') setView('students');
+    else {
       setNotification(`${feature} is currently under development. Available soon!`);
       setTimeout(() => setNotification(null), 3000);
     }
@@ -88,7 +93,7 @@ const TeacherDashboard = () => {
                 icon={<FaChartPie className="text-3xl text-gray-500" />}
                 title="Attendance Analytics"
                 desc="View graphs and monthly reports."
-                active={false}
+                active={true}
                 onClick={() => handleFeatureClick('Analytics')}
               />
 
@@ -97,7 +102,7 @@ const TeacherDashboard = () => {
                 icon={<FaHistory className="text-3xl text-gray-500" />}
                 title="Session History"
                 desc="Review past classes and logs."
-                active={false}
+                active={true}
                 onClick={() => handleFeatureClick('History')}
               />
 
@@ -106,7 +111,7 @@ const TeacherDashboard = () => {
                 icon={<FaUserGraduate className="text-3xl text-gray-500" />}
                 title="Manage Students"
                 desc="View profiles and edit details."
-                active={false}
+                active={true}
                 onClick={() => handleFeatureClick('Students')}
               />
             </div>
@@ -142,6 +147,28 @@ const TeacherDashboard = () => {
                  </div>
              </div>
 
+          </div>
+        )}
+
+        {/* VIEW: SESSION HISTORY */}
+        {view === 'history' && (
+          <div className="max-w-6xl mx-auto">
+            <SessionHistory onBack={() => setView('dashboard')} />
+         </div>
+        )}
+
+
+        {/* VIEW: ANALYTICS */}
+        {view === 'analytics' && (
+          <div className="max-w-6xl mx-auto">
+            <TeacherAnalytics onBack={() => setView('dashboard')} />
+          </div>
+        )}
+
+        {/* VIEW: MANAGE STUDENTS */}
+        {view === 'students' && (
+          <div className="max-w-6xl mx-auto">
+            <ManageStudents onBack={() => setView('dashboard')} />
           </div>
         )}
 
@@ -181,38 +208,3 @@ const DashboardCard = ({ icon, title, desc, active, onClick }) => (
 export default TeacherDashboard;
 
 
-
-// import { useState } from 'react';
-// import CreateSession from '../components/teacher/CreateSession';
-// import LiveQR from '../components/teacher/LiveQR';
-
-// const TeacherDashboard = () => {
-//   const [activeSessionId, setActiveSessionId] = useState(null);
-
-//   return (
-//     <div className="min-h-screen bg-gray-50 flex flex-col items-center pt-10">
-
-//       <h1 className="text-4xl font-extrabold text-blue-900 mb-8">
-//         Smart Attendance System
-//       </h1>
-
-//       {/* Conditional Rendering: Form OR QR Screen */}
-//       {!activeSessionId ? (
-//         <CreateSession onSessionStarted={(id) => setActiveSessionId(id)} />
-//       ) : (
-//         <div className="animate-fade-in-up">
-//            <button
-//              onClick={() => setActiveSessionId(null)}
-//              className="mb-4 text-sm text-gray-500 hover:text-red-500 underline"
-//            >
-//              ← End Session
-//            </button>
-//            <LiveQR sessionId={activeSessionId} />
-//         </div>
-//       )}
-
-//     </div>
-//   );
-// };
-
-// export default TeacherDashboard;

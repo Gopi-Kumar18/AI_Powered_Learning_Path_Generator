@@ -4,6 +4,7 @@ import axios from 'axios';
 import { FaThLarge, FaQrcode, FaHistory, FaUser, FaSignOutAlt, FaBars, FaChevronRight, FaCheckCircle, FaTimesCircle, FaCalendarAlt, FaExclamationTriangle, FaClock } from 'react-icons/fa';
 import StudentScanner from '../components/student/StudentScanner';
 import { useAuth } from '../context/AuthContext';
+import StudentProfile from '../components/student/StudentProfile';
 
 // Timetable UI Data
 const TIMETABLE = {
@@ -209,6 +210,14 @@ const StudentDashboard = () => {
                )}
 
                {view === 'scanner' && <StudentScanner />}
+
+               {/* PROFILE VIEW */}
+               {!loading && view === 'profile' && (
+                  <div className="max-w-6xl mx-auto">
+                     <StudentProfile onBack={() => setView('dashboard')} />
+                  </div>
+               )}
+               
              </>
            )}
         </main>

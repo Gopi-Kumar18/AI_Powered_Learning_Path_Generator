@@ -6,10 +6,10 @@ import { FaUserShield, FaSpinner } from "react-icons/fa";
 const LoginPage = () => {
 
   //   // 1. ADD THIS TEMPORARY EFFECT
-  // useEffect(() => {
-  //   console.log("Cleaning old tokens...");
-  //   localStorage.clear(); // Wipes the bad token
-  // }, []);
+  useEffect(() => {
+    console.log("Cleaning old tokens...");
+    localStorage.clear(); // Wipes the bad token
+  }, []);
   
   const [userId, setUserId] = useState("");
   const [password, setPassword] = useState("");
