@@ -4,7 +4,7 @@ import StudentDashboard from './pages/StudentDashboard';
 // import StudentScanner from './components/student/StudentScanner';
 import { AuthProvider, useAuth } from "./context/AuthContext";
 import LoginPage from "./pages/LoginPage";
-import AdminDashboard from './components/admin/AdminDashBoard';
+import AdminDashboard from './components/admin/AdminDashboard';
 
 const ProtectedRoute = ({ children, allowedRole }) => {
   const { user } = useAuth();
