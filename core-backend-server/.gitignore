@@ -2,6 +2,7 @@ HELP.md
 
 ### app.properties ###
 src/main/resources/application.properties
+application.properties
 
 
 target/
