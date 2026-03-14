@@ -275,20 +275,7 @@ export const getAILearningPath = async (studentId, subject) => {
 };
 
 
-// export const generateAILearningPath = async (studentId, subject) => {
-//   try {
-//     const token = localStorage.getItem('token');
-//     // const response = await axios.post(`http://localhost:8080/api/ai/path/generate/${studentId}`, {
-//     const response = await axios.post(`https://7fdblmk4-8080.inc1.devtunnels.ms/api/ai/path/generate/${studentId}`, 
-//       { subject }, 
-//       { headers: { Authorization: `Bearer ${token}` } }
-//     );
-//     return response.data;
-//   } catch (error) {
-//     console.error("Failed to generate AI path", error);
-//     return { status: "ERROR", message: "AI generation failed." };
-//   }
-// };
+
 
 
 

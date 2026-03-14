@@ -1,13 +1,13 @@
 import { useState } from 'react';
 import ReactMarkdown from 'react-markdown';
-import { FaRobot, FaMagic, FaBookOpen, FaArrowLeft } from 'react-icons/fa';
+import { FaRobot, FaMagic, FaBookOpen, FaArrowLeft, FaBrain } from 'react-icons/fa';
 import { getAILearningPath } from '../../services/qrAttendanceService';
 import { useAuth } from '../../context/AuthContext';
 
-const AILearningPath = ({ onBack }) => {
+const AILearningPath = ({ onBack, onNavigateToAssessment }) => {
   const { user } = useAuth();
   
-  // Available subjects (Matches your Timetable)
+  // Available subjects (Matches our Timetable)
   const subjects = ["Java Programming", "DSA", "OS", "Computer Networks", "Verbal Ability", "OS LAB"];
   
   const [selectedSubject, setSelectedSubject] = useState('');
@@ -28,20 +28,6 @@ const AILearningPath = ({ onBack }) => {
     } 
     setLoading(false);
   };
-
-  // const handleGenerateNew = async () => {
-  //   if (!selectedSubject) return;
-  //   setGenerating(true);
-    
-  //   const result = await generateAILearningPath(user.userId, selectedSubject);
-    
-  //   if (result.status === 'SUCCESS') {
-  //     setRoadmap(result.data.aiGeneratedRoadmap);
-  //   } else {
-  //     alert("Failed to generate. Please try again.");
-  //   }
-  //   setGenerating(false);
-  // };
 
   return (
     <div className="max-w-5xl mx-auto animate-fade-in-up space-y-6">
@@ -75,17 +61,12 @@ const AILearningPath = ({ onBack }) => {
           </select>
         </div>
         
-        {/* <button 
-          onClick={handleGenerateNew}
-          disabled={!selectedSubject || generating}
-          className={`w-full md:w-auto mt-6 md:mt-0 px-6 py-3 rounded-xl font-bold flex items-center justify-center gap-2 transition-all shadow-lg ${!selectedSubject || generating ? 'bg-gray-200 text-gray-400 cursor-not-allowed' : 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white hover:from-purple-700 hover:to-indigo-700 shadow-purple-500/30'}`}
-        >
-          {generating ? (
-            <><span className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></span> Generating...</>
-          ) : (
-            <><FaMagic /> Generate Fresh Roadmap</>
-          )}
-        </button> */}
+        { /* This button now redirects to the Assessment View */}
+        <button 
+          onClick={onNavigateToAssessment}
+          className="w-full md:w-auto mt-6 md:mt-0 px-6 py-3 rounded-xl font-bold flex items-center justify-center gap-2 transition-all shadow-lg bg-gradient-to-r from-purple-600 to-indigo-600 text-white hover:from-purple-700 hover:to-indigo-700 shadow-purple-500/30">
+          <FaBrain /> Take Assessment to Generate
+        </button>
         
       </div>
 

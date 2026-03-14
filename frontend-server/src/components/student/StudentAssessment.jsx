@@ -3,7 +3,6 @@ import { FaBrain, FaArrowLeft, FaCheckCircle, FaTimesCircle, FaPlay } from 'reac
 import { generateAIQuiz, submitQuizScore, getComprehensiveAILearningPath } from '../../services/qrAttendanceService';
 import { useAuth } from '../../context/AuthContext';
 import ReactMarkdown from 'react-markdown';
-import axios from 'axios';
 
 const StudentAssessment = ({ onBack }) => {
   const { user } = useAuth();

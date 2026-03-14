@@ -235,7 +235,8 @@ const StudentDashboard = () => {
                {/* AI ADVISOR VIEW */}
                {!loading && view === 'ai-advisor' && (
                   <div className="max-w-6xl mx-auto">
-                     <AILearningPath onBack={() => setView('dashboard')} />
+                     <AILearningPath onBack={() => setView('dashboard')} 
+                     onNavigateToAssessment={() => setView('assessment')} />
                   </div>
                )}
 
