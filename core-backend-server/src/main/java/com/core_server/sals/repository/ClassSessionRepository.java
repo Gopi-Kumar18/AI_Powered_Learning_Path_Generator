@@ -11,6 +11,7 @@ import java.util.List;
 
 public interface ClassSessionRepository extends JpaRepository<ClassSession, Long> {
 
+    // Spring auto-generates this to quickly fetch a session using the random code (like "DSA-9A8B") generated when a teacher starts a class.
     ClassSession findBySessionIdentifier(String sessionIdentifier);
 
     // 1. Count sessions this week
@@ -22,7 +23,8 @@ public interface ClassSessionRepository extends JpaRepository<ClassSession, Long
     @Query("SELECT COUNT(s) FROM ClassSession s WHERE s.subject.id = :subjectId AND s.isValidSchedule = true")
     long countValidSessionsBySubjectId(@Param("subjectId") Long subjectId);
 
-    // For Controller: Count how many legitimate classes happened today for Makeup logic
+    // A highly specific query used by your backend logic to check, "Did this teacher already host their scheduled class today?"
+    // If this returns > 0, the next class created today is automatically marked as a makeup session.
     @Query("SELECT COUNT(s) FROM ClassSession s WHERE s.subject.id = :subjectId AND s.isValidSchedule = true AND s.createdAt BETWEEN :start AND :end")
     long countTodayValidSessions(@Param("subjectId") Long subjectId, @Param("start") LocalDateTime start, @Param("end") LocalDateTime end);
 

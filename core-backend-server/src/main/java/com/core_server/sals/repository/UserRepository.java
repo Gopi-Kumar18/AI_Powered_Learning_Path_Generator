@@ -8,6 +8,8 @@ import java.util.Optional;
 
 
 public interface UserRepository extends JpaRepository<User, String> {
+
+    // These use Optional<User>. This is used for Finding records that might not exist. If someone types in the wrong university ID on the login page, this prevents the backend from crashing with a NullPointerException.
     Optional<User> findByCustomId(String userId);
     Optional<User> findByEmail(String email);
 }

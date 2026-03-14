@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 
 @Entity
 @Data
-@Table(name = "attendance_records")
+@Table(name = "attendance_records", uniqueConstraints = { @UniqueConstraint(columnNames = {"student_id", "session_id" })}) // Ensures Idempotent Attendance
 public class Attendance {
 
     @Id

@@ -22,10 +22,8 @@ public class ClassSession {
     @JoinColumn(name = "subject_id")
     private Subject subject;
 
-    //change - 1
     @Column(name = "is_makeup")
     private boolean isMakeup;
-
 
     @Column(name = "is_valid_schedule")
     private Boolean isValidSchedule = true;

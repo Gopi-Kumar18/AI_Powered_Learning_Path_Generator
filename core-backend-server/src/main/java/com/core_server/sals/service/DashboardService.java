@@ -23,10 +23,10 @@ public class DashboardService {
     @Autowired private ClassSessionRepository sessionRepo;
     @Autowired private SubjectRepository subjectRepo;
 
+    // ----- 1. Provides clean and neat Student Metrics(like: Subjects, Attendance Stats, Recent Activity, etc..) ----
     public StudentDashboardDTO getStudentStats(String studentId) {
         StudentDashboardDTO stats = new StudentDashboardDTO();
 
-        // 1. Get All Subjects
         List<Subject> subjects = subjectRepo.findAll();
 
         List<StudentDashboardDTO.SubjectStat> subjectStats = new ArrayList<>();
@@ -74,13 +74,12 @@ public class DashboardService {
                 ((double) totalAttendedOverall / totalSessionsOverall) * 100;
 
         // 3. Classes This Week
-        // Calculate start (Monday) and end (Now) of current week
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime startOfWeek = now.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY)).withHour(0).withMinute(0);
 
         stats.classesThisWeek = sessionRepo.countSessionsBetween(startOfWeek, now);
 
-        // change 9 : 4. Recent Activity (Strictly TODAY, resets at 12:00 AM)
+        //  4. Recent Activity (Strictly TODAY, resets at 12:00 AM)
         LocalDateTime startOfDay = LocalDateTime.now().with(java.time.LocalTime.MIN);
         LocalDateTime endOfDay = LocalDateTime.now().with(java.time.LocalTime.MAX);
 

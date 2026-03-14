@@ -23,6 +23,7 @@ public class FaceVerificationService {
     private final String AI_SERVER_URL = "http://localhost:8000/verify-face";
     private final RestTemplate restTemplate = new RestTemplate();
 
+    // 1. Face Validation Service method for veryfying a student's face(FastAPI Backend) -----
     public boolean verifyStudentFace(String studentId, MultipartFile selfieFile) {
         try {
             // 1. Prepare the Headers (We are sending a File)
@@ -42,7 +43,7 @@ public class FaceVerificationService {
             // 3. Wrap it in a Request
             HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
 
-            // 4. Send POST Request to Python
+            // 4. Send POST Request to FastAPI Backend
             ResponseEntity<Map> response = restTemplate.postForEntity(AI_SERVER_URL, requestEntity, Map.class);
 
             // 5. Check Result

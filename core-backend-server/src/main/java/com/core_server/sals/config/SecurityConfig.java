@@ -35,13 +35,13 @@ public class SecurityConfig {
                 // 1. Disable CSRF (Essential for non-browser clients like Postman/Mobile Apps)
                 .csrf(csrf -> csrf.disable())
 
-                // 2. Enable CORS (To allow your Frontend running on a different port)
+                // 2. Enable CORS (To allow our Frontend running on a different port)
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
 
                 .authorizeHttpRequests(auth -> auth
                         // Allow these specific endpoints without login
-                        .requestMatchers("/api/auth/**", "/api/attendance/**", "/api/teacher/**", "/api/admin/**").permitAll()
-                        // Lock everything else
+                        .requestMatchers("/api/auth/**", "/api/attendance/**", "/api/teacher/**", "/api/admin/**", "/api/ai/**", "/error").permitAll()
+                        // authenticate everything else
                         .anyRequest().authenticated()
                 )
                  .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -57,7 +57,7 @@ public class SecurityConfig {
 
         configuration.setAllowedOriginPatterns(List.of("*"));
 
-//        configuration.setAllowedOrigins(List.of("http://localhost:5173", "http://localhost:8000","https://7fdblmk4-5173.inc1.devtunnels.ms", "*")); // '*' allows all for testing
+//        configuration.setAllowedOrigins(List.of("http://localhost:5173", "http://localhost:8000","https://7fdblmk4-5173.inc1.devtunnels.ms"));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
 
         configuration.setAllowedHeaders(List.of("*"));

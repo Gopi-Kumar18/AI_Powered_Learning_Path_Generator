@@ -18,7 +18,7 @@ public class RequestLoggingFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
 
-        // 1. CAPTURE INCOMING (Detector Triggered)
+        // 1. CAPTURE INCOMING (Request Recieving)
         long startTime = System.currentTimeMillis();
         System.out.println("⬇️ [INCOMING] " + request.getMethod() + " " + request.getRequestURI() + " from IP: " + request.getRemoteAddr());
 

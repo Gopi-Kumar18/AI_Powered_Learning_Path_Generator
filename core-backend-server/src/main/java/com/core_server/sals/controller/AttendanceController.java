@@ -35,6 +35,7 @@ public class AttendanceController {
     @Autowired private GeofencingService geofencingService;
     @Autowired private FaceVerificationService faceService;
 
+    // ----- 1. Timetable -----
     private static final Map<DayOfWeek, List<String>> TIMETABLE = Map.of(
             DayOfWeek.MONDAY, List.of("OS", "Computer Networks", "Java Programming", "OS Lab"),
             DayOfWeek.TUESDAY, List.of("OS", "Computer Networks", "Java Programming", "DBMS", "DSA"),
@@ -47,8 +48,9 @@ public class AttendanceController {
             DayOfWeek.SUNDAY, List.of("Java Programming", "DSA", "DBMS", "OS")
     );
 
-@PostMapping("/create-session")
-public Map<String, String> createSession(@RequestBody Map<String, String> sessionData) {
+    // ----- 2. Attendance Session Creation -----
+    @PostMapping("/create-session")
+    public Map<String, String> createSession(@RequestBody Map<String, String> sessionData) {
     String subjectName = sessionData.get("subject");
 
     Subject subjectEntity = subjectRepository.findByName(subjectName);
@@ -83,9 +85,9 @@ public Map<String, String> createSession(@RequestBody Map<String, String> sessio
         long alreadyCreatedCount = sessionRepository.countTodayValidSessions(subjectEntity.getId(), startOfDay, endOfDay);
 
         if (alreadyCreatedCount >= scheduledCount) {
-            session.setMakeup(true); // Trigger Makeup Feature
+            session.setMakeup(true); // Trigger Makeup Class
         } else {
-            session.setMakeup(false); // Normal Feature
+            session.setMakeup(false); // Normal Class
         }
     }
 
@@ -96,14 +98,14 @@ public Map<String, String> createSession(@RequestBody Map<String, String> sessio
     return Map.of("sessionId", uniqueId, "isMakeup", String.valueOf(session.isMakeup()));
 }
 
-    // 2. GENERATE QR
+    // ----- 2. GENERATE QR(token) for every 10sec -----
     @GetMapping("/generate-qr")
     public Map<String, String> getDynamicQr(@RequestParam String sessionId) {
         String token = qrCodeService.generateDynamicQrToken(sessionId);
         return Map.of("qrToken", token, "expiresIn", "10s");
     }
 
-    // 3. MARK ATTENDANCE
+    // ----- 3. MARK ATTENDANCE ------
     @PostMapping(value = "/mark", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public Map<String, Object> markAttendance(
             @RequestParam("qrToken") String token,
@@ -113,7 +115,7 @@ public Map<String, String> createSession(@RequestBody Map<String, String> sessio
             @RequestParam("file") MultipartFile file
     ) {
         // A. Validate Token
-        if (!qrCodeService.validateToken(token)) { return Map.of("status", "ERROR", "message", "QR Code Expired"); }
+        if (!qrCodeService.validateToken(token)) { return Map.of("status", "ERROR", "message", "QR code has been Expired"); }
 
         // B. Extract Session ID (Using the new method in QRCodeService)
         String sessionId = qrCodeService.extractSessionId(token);
@@ -129,6 +131,7 @@ public Map<String, String> createSession(@RequestBody Map<String, String> sessio
 
         boolean isScheduledToday = validSubjectsToday.stream().anyMatch(s -> s.equalsIgnoreCase(session.getSubject().getName()));
 
+        // C. No Class present on a specific day
         if (!isScheduledToday && !session.isMakeup()) { return Map.of("status", "REJECTED", "message", "No such class named on this specific day"); }
 
         // D. Validate Location

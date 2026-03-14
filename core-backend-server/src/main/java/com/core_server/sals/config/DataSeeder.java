@@ -19,7 +19,7 @@ public class DataSeeder implements CommandLineRunner {
     }
 
     @Override
-    public void run(String... args) {
+    public void run(String ...args) {
         // 1. Create Teacher if not exists
         if (userRepository.findByCustomId("29781").isEmpty()) {
             User teacher = new User(

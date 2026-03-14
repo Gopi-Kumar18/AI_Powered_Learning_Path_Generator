@@ -17,9 +17,10 @@ public class QRCodeService {
 
     private final SecretKey key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
 
-    // How long the QR code is valid (in milliseconds).10000ms = 10 seconds.
-    private static final long EXPIRATION_TIME = 30000;
+    // How long the QR code is valid (in milliseconds).20000ms = 20 seconds.
+    private static final long EXPIRATION_TIME = 20000;
 
+    // ----- 1. Dynamic QR Code(nothing but Token) Generation Service Method -----
     public String generateDynamicQrToken(String sessionIdentifier) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("type", "attendance_qr");
@@ -36,6 +37,7 @@ public class QRCodeService {
                 .compact();
     }
 
+    // ----- 2. Validating The token -----
     public boolean validateToken(String token) {
         try {
             Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
@@ -45,7 +47,7 @@ public class QRCodeService {
         }
     }
 
-    // --- NEW METHOD NEEDED FOR ATTENDANCE MARKING ---
+    // ----- 3. METHOD NEEDED FOR ATTENDANCE MARKING -----
     public String extractSessionId(String token) {
         try {
             return Jwts.parserBuilder()

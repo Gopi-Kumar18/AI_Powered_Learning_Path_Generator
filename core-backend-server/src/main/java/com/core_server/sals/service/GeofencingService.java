@@ -10,26 +10,22 @@ public class GeofencingService {
     private static final double ALLOWED_RADIUS_METERS = 1000.0;
 
     // LPU 31.256479996291617, 75.70494036822915
-//    private static final double CLASS_LAT = 31.25567003530153;
-//    private static final double CLASS_LNG = 75.70475791210389;
+    private static final double CLASS_LAT = 31.25567003530153;
+    private static final double CLASS_LNG = 75.70475791210389;
 
 //  Live
 //    private static final double CLASS_LAT = 31.255255092082944;
 //    private static final double CLASS_LNG = 75.70322245141388;
 
-    private static final double CLASS_LAT = 28.64109633679477;
-    private static final double CLASS_LNG = 77.41501090768479;
 
-    /**
-     * Returns TRUE if student is inside the radius.
-     */
+     // ----- 1. Returns TRUE if student is inside the radius, and FALSE if not -----
     public boolean isWithinRange(double studentLat, double studentLng) {
         double distance = calculateDistance(CLASS_LAT, CLASS_LNG, studentLat, studentLng);
-        System.out.println("Distance Calculated: " + distance + " meters"); // For Debugging
+//        System.out.println("Distance Calculated: " + distance + " meters"); // For Debugging
         return distance <= ALLOWED_RADIUS_METERS;
     }
 
-    // Haversine Formula Implementation
+    // ----- 2. Haversine Formula Implementation for GEOFENCING feature -----
     private double calculateDistance(double lat1, double lon1, double lat2, double lon2) {
         final int R = 6371; // Radius of the earth in km
 
@@ -41,7 +37,7 @@ public class GeofencingService {
                 * Math.sin(lonDistance / 2) * Math.sin(lonDistance / 2);
 
         double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-        double distance = R * c * 1000; // Convert to meters
+        double distance = R * c * 1000;
 
         return distance;
     }

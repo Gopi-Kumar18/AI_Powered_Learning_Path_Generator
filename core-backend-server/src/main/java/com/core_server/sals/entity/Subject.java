@@ -14,4 +14,7 @@ public class Subject {
 
     private String name; // e.g., "Data Structures"
     private String code; // e.g., "CS301"
+
+    @Column(columnDefinition = "LONGTEXT")
+    private String syllabusText;
 }

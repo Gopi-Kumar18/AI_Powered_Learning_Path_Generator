@@ -20,14 +20,13 @@ import java.util.LinkedHashMap;
 
 @RestController
 @RequestMapping("/api/teacher")
-//@CrossOrigin(origins = "*")
+@CrossOrigin(origins = "*")
 public class TeacherController {
 
     @Autowired private AttendanceRepository attendanceRepository;
-
     @Autowired private ClassSessionRepository classSessionRepository;
 
-    // ----- FEATURE 4 : API to get live attendance for a running session -----
+    // ----- 1. API To Fetch Students Attending a Live Running Session -----
     @GetMapping("/session-logs/{sessionIdentifier}")
     public Map<String, Object> getLiveSessionLogs(@PathVariable String sessionIdentifier) {
         List<Attendance> logs = attendanceRepository.findBySession_SessionIdentifierOrderByTimestampDesc(sessionIdentifier);
@@ -47,7 +46,7 @@ public class TeacherController {
         );
     }
 
-    // --- FEATURE 5: GET ALL PAST SESSIONS ---
+    // ----- 2. Fetch All Past SESSIONS -----
     @GetMapping("/sessions/{teacherId}")
     public List<Map<String, Object>> getTeacherSessions(@PathVariable String teacherId) {
         List<ClassSession> sessions = classSessionRepository.findByTeacherIdOrderByCreatedAtDesc(teacherId);
@@ -70,7 +69,7 @@ public class TeacherController {
     }
 
 
-    // --- FEATURE 6: TEACHER ANALYTICS DASHBOARD ---
+    // ----- 3. Fetch TEACHER ANALYTICS DB Stats -----
     @GetMapping("/analytics/{teacherId}")
     public Map<String, Object> getTeacherAnalytics(@PathVariable String teacherId) {
         List<ClassSession> sessions = classSessionRepository.findByTeacherIdOrderByCreatedAtDesc(teacherId);
@@ -78,10 +77,9 @@ public class TeacherController {
         int totalSessions = sessions.size();
         long totalPresentOverall = 0;
 
-        // Maps to aggregate data
         Map<String, Integer> subjectSessionCount = new HashMap<>();
         Map<String, Long> subjectPresentCount = new HashMap<>();
-        Map<String, Long> dailyTrend = new LinkedHashMap<>(); // Keeps date order
+        Map<String, Long> dailyTrend = new LinkedHashMap<>();
 
         for (ClassSession s : sessions) {
             String subject = s.getSubject() != null ? s.getSubject().getName() : "Unknown";
@@ -90,11 +88,9 @@ public class TeacherController {
             long presentCount = attendanceRepository.countBySession_Id(s.getId());
             totalPresentOverall += presentCount;
 
-            // Aggregate subject averages
             subjectSessionCount.put(subject, subjectSessionCount.getOrDefault(subject, 0) + 1);
             subjectPresentCount.put(subject, subjectPresentCount.getOrDefault(subject, 0L) + presentCount);
 
-            // Aggregate daily trend
             dailyTrend.put(date, dailyTrend.getOrDefault(date, 0L) + presentCount);
         }
 
@@ -123,7 +119,7 @@ public class TeacherController {
         );
     }
 
-    // --- FEATURE 7: MANAGE STUDENTS ---
+    // ----- 4. MANAGE STUDENTS FEATURE-----
     @GetMapping("/students/{teacherId}")
     public List<Map<String, Object>> getTeacherStudents(@PathVariable String teacherId) {
         List<Object[]> stats = attendanceRepository.findStudentStatsForTeacher(teacherId);
@@ -134,7 +130,6 @@ public class TeacherController {
             map.put("studentId", row[0]);
             map.put("totalAttended", row[1]);
 
-            // Format the timestamp nicely
             if (row[2] != null) {
                 java.time.LocalDateTime lastSeen = (java.time.LocalDateTime) row[2];
                 map.put("lastSeenDate", lastSeen.toLocalDate().toString());
@@ -150,16 +145,14 @@ public class TeacherController {
     }
 
 
-    // --- FEATURE 9: EXPORT SESSION ATTENDANCE TO CSV ---
+    // ----- 5. EXPORT SESSION ATTENDANCE TO CSV -----
     @GetMapping(value = "/sessions/{sessionIdentifier}/export", produces = "text/csv")
     public ResponseEntity<String> exportSessionAttendance(@PathVariable String sessionIdentifier) {
         List<Attendance> logs = attendanceRepository.findBySession_SessionIdentifierOrderByTimestampDesc(sessionIdentifier);
 
         StringBuilder csvBuilder = new StringBuilder();
-        // CSV Header row
         csvBuilder.append("Student ID,Verification Status,Time Marked\n");
 
-        // Data rows
         for (Attendance a : logs) {
             String time = a.getTimestamp().toLocalTime().toString().substring(0, 5);
             csvBuilder.append(a.getStudentId()).append(",")
@@ -168,7 +161,6 @@ public class TeacherController {
         }
 
         HttpHeaders headers = new HttpHeaders();
-        // This header forces the browser to download the file instead of displaying text
         headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=attendance_" + sessionIdentifier + ".csv");
 
         return new ResponseEntity<>(csvBuilder.toString(), headers, HttpStatus.OK);

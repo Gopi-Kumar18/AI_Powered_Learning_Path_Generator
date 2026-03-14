@@ -18,14 +18,14 @@ public class StudentController {
     @Autowired private DashboardService dashboardService;
     @Autowired private UserRepository userRepository;
 
-
+    // ----- 1. GET STUDENT STATS ---
     @GetMapping("/stats/{studentId}")
     public StudentDashboardDTO getStudentStats(@PathVariable String studentId) {
         return dashboardService.getStudentStats(studentId);
     }
 
 
-    // --- NEW FEATURE 8: GET STUDENT PROFILE ---
+    // ----- 2. GET STUDENT PROFILE -----
     @GetMapping("/profile/{studentId}")
     public Map<String, Object> getStudentProfile(@PathVariable String studentId) {
         Optional<User> userOpt = userRepository.findByCustomId(studentId);
@@ -38,8 +38,8 @@ public class StudentController {
                     "name", user.getName(),
                     "email", user.getEmail(),
                     "role", user.getRole(),
-                    "biometricStatus", "Verified", // Assuming verified if they can log in/scan
-                    "joinDate", "August 2024" // Placeholder for batch/join date
+                    "biometricStatus", "Verified",
+                    "joinDate", "August 2024"
             );
         }
 
