@@ -2,12 +2,33 @@ import { useState, useEffect } from 'react';
 import { FaUsers, FaChalkboardTeacher, FaServer, FaUserPlus, FaSignOutAlt } from 'react-icons/fa';
 import { getSystemStats, registerUser } from '../../services/adminService';
 import { useAuth } from '../../context/AuthContext';
+import { uploadSubjectSyllabus } from '../../services/adminService';
+
+
 
 const AdminDashboard = () => {
   const { logout } = useAuth();
+
   const [stats, setStats] = useState({ totalStudents: 0, totalTeachers: 0, totalSessions: 0 });
   const [formData, setFormData] = useState({ customId: '', name: '', email: '', password: '', role: 'STUDENT' });
   const [message, setMessage] = useState(null);
+
+  // --- New State for Syllabus Upload ---
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [uploadSubjectId, setUploadSubjectId] = useState('');
+  const [uploadMessage, setUploadMessage] = useState(null);
+  const [isUploading, setIsUploading] = useState(false);
+
+const subjects = [
+    
+    { id: 1, name: "OS" },
+    { id: 2, name: "DSA" },
+    { id: 3, name: "OS LAB" },
+    { id: 4, name: "Verbal Ability" },
+    { id: 5, name: "Java Programming" },
+    { id: 6, name: "Computer Networks" },
+    
+];
 
   useEffect(() => {
     const fetchStats = async () => {
@@ -27,6 +48,29 @@ const AdminDashboard = () => {
       if (updatedStats) setStats(updatedStats);
     }
     setTimeout(() => setMessage(null), 4000);
+  };
+
+
+  const handleFileUpload = async (e) => {
+    e.preventDefault();
+    if (!selectedFile || !uploadSubjectId) {
+      setUploadMessage({ status: 'ERROR', message: 'Please select a subject and a file.' });
+      return;
+    }
+
+    setIsUploading(true);
+    // Call the service we just created
+    const result = await uploadSubjectSyllabus(uploadSubjectId, selectedFile);
+    setUploadMessage(result);
+    setIsUploading(false);
+
+    if (result.status === 'SUCCESS') {
+      setSelectedFile(null);
+      // Reset the file input visually
+      document.getElementById('syllabus-upload').value = ''; 
+    }
+    
+    setTimeout(() => setUploadMessage(null), 4000);
   };
 
   return (
@@ -109,6 +153,55 @@ const AdminDashboard = () => {
             </div>
             <button type="submit" className="md:col-span-2 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg transition shadow-lg shadow-blue-500/30 mt-2">
               Create Account
+            </button>
+          </form>
+        </div>
+
+
+        {/* --- NEW: Syllabus Upload Card --- */}
+        <div className="lg:col-span-3 bg-white rounded-2xl shadow-sm border border-gray-200 p-8 mt-4">
+          <h2 className="text-xl font-bold flex items-center gap-2 mb-6 border-b pb-4">
+            <span className="text-2xl text-purple-600">📄</span> Upload Subject Syllabus (PDF)
+          </h2>
+          
+          {uploadMessage && (
+            <div className={`p-4 rounded-lg mb-6 font-bold text-sm ${uploadMessage.status === 'SUCCESS' ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-red-50 text-red-700 border border-red-200'}`}>
+              {uploadMessage.message}
+            </div>
+          )}
+
+          <form onSubmit={handleFileUpload} className="flex flex-col md:flex-row items-end gap-6">
+            <div className="w-full md:w-1/3">
+              <label className="block text-sm font-bold text-slate-500 mb-2">Select Subject</label>
+              <select 
+                value={uploadSubjectId} 
+                onChange={(e) => setUploadSubjectId(e.target.value)} 
+                className="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-purple-500 outline-none font-bold text-slate-700"
+              >
+                <option value="">-- Choose Subject --</option>
+                {subjects.map(sub => (
+                  <option key={sub.id} value={sub.id}>{sub.name}</option>
+                ))}
+              </select>
+            </div>
+            
+            <div className="w-full md:w-1/3">
+              <label className="block text-sm font-bold text-slate-500 mb-2">Syllabus PDF File</label>
+              <input 
+                type="file" 
+                id="syllabus-upload"
+                accept="application/pdf"
+                onChange={(e) => setSelectedFile(e.target.files[0])}
+                className="w-full border border-gray-300 rounded-lg p-2 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-bold file:bg-purple-50 file:text-purple-700 hover:file:bg-purple-100" 
+              />
+            </div>
+            
+            <button 
+              type="submit" 
+              disabled={isUploading || !selectedFile || !uploadSubjectId}
+              className="w-full md:w-auto bg-purple-600 hover:bg-purple-700 disabled:bg-gray-400 text-white font-bold py-3 px-8 rounded-lg transition shadow-lg shadow-purple-500/30 whitespace-nowrap"
+            >
+              {isUploading ? 'Extracting & Saving...' : 'Upload & Parse PDF'}
             </button>
           </form>
         </div>

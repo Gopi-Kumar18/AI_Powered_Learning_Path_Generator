@@ -197,10 +197,9 @@ export const downloadAttendanceCSV = async (sessionId) => {
     // const response = await axios.get(`http://localhost:8080/api/teacher/sessions/${sessionId}/export`, {
     const response = await axios.get(`https://7fdblmk4-8080.inc1.devtunnels.ms/api/teacher/sessions/${sessionId}/export`, {
       headers: { Authorization: `Bearer ${token}` },
-      responseType: 'blob' // CRITICAL: Tells Axios to expect a file, not JSON
+      responseType: 'blob' 
     });
 
-    // Create a hidden link, attach the blob, and force a click to trigger download
     const url = window.URL.createObjectURL(new Blob([response.data]));
     const link = document.createElement('a');
     link.href = url;
@@ -214,6 +213,83 @@ export const downloadAttendanceCSV = async (sessionId) => {
     alert("Failed to download the attendance report.");
   }
 };
+
+
+// --- AI QUIZ ASSESSMENT SERVICE + AI LEARNING PATH SERVICES ---
+
+export const generateAIQuiz = async (studentId, subjectId) => {
+  try {
+    const token = localStorage.getItem('token');
+    const response = await axios.get(`https://7fdblmk4-8080.inc1.devtunnels.ms/api/ai/quiz/generate/${studentId}/${subjectId}`, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Failed to fetch AI quiz", error);
+    return { status: "ERROR", message: "Failed to connect to the AI service." };
+  }
+};
+
+
+export const submitQuizScore = async (studentId, subjectId, score) => {
+  try {
+    const token = localStorage.getItem('token');
+    const response = await axios.post(`https://7fdblmk4-8080.inc1.devtunnels.ms/api/ai/quiz/submit`, 
+      { studentId, subjectId, score },
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Failed to submit quiz score", error);
+    return { status: "ERROR", message: "Failed to submit score." };
+  }
+};
+
+export const getComprehensiveAILearningPath = async (studentId, subjectId) => {
+  try {
+    const token = localStorage.getItem('token');
+    const response = await axios.get(`https://7fdblmk4-8080.inc1.devtunnels.ms/api/ai/path/comprehensive/${studentId}/${subjectId}`, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Failed to generate AI roadmap", error);
+    return { status: "ERROR", message: "Failed to generate roadmap." };
+  }
+};
+
+// --- AI LEARNING PATH SERVICES ---
+
+export const getAILearningPath = async (studentId, subject) => {
+  try {
+    const token = localStorage.getItem('token');
+    // const response = await axios.get(`http://localhost:8080/api/ai/path/${studentId}/${subject}`, {
+    const response = await axios.get(`https://7fdblmk4-8080.inc1.devtunnels.ms/api/ai/path/${studentId}/${subject}`, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Failed to fetch AI path", error);
+    return { status: "ERROR" };
+  }
+};
+
+
+// export const generateAILearningPath = async (studentId, subject) => {
+//   try {
+//     const token = localStorage.getItem('token');
+//     // const response = await axios.post(`http://localhost:8080/api/ai/path/generate/${studentId}`, {
+//     const response = await axios.post(`https://7fdblmk4-8080.inc1.devtunnels.ms/api/ai/path/generate/${studentId}`, 
+//       { subject }, 
+//       { headers: { Authorization: `Bearer ${token}` } }
+//     );
+//     return response.data;
+//   } catch (error) {
+//     console.error("Failed to generate AI path", error);
+//     return { status: "ERROR", message: "AI generation failed." };
+//   }
+// };
+
 
 
 

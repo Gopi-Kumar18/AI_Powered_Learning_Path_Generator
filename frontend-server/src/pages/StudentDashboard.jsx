@@ -1,10 +1,14 @@
-//Latest UI
+
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-import { FaThLarge, FaQrcode, FaHistory, FaUser, FaSignOutAlt, FaBars, FaChevronRight, FaCheckCircle, FaTimesCircle, FaCalendarAlt, FaExclamationTriangle, FaClock } from 'react-icons/fa';
+import { FaThLarge, FaQrcode, FaHistory, FaUser, FaSignOutAlt, FaBars, FaChevronRight, FaCheckCircle, FaTimesCircle, FaCalendarAlt, FaExclamationTriangle, FaClock, FaRobot, FaBrain } from 'react-icons/fa';
 import StudentScanner from '../components/student/StudentScanner';
 import { useAuth } from '../context/AuthContext';
 import StudentProfile from '../components/student/StudentProfile';
+import AILearningPath from '../components/student/AILearningPath';
+import StudentAssessment from '../components/student/StudentAssessment';
+
+
 
 // Timetable UI Data
 const TIMETABLE = {
@@ -49,7 +53,9 @@ const StudentDashboard = () => {
   const navItems = [
     { id: 'dashboard', label: 'Dashboard', icon: <FaThLarge /> },
     { id: 'scanner', label: 'Mark Attendance', icon: <FaQrcode /> },
-    { id: 'history', label: 'Overall Attendance', icon: <FaHistory /> }, // Renamed
+    { id: 'history', label: 'Overall Attendance', icon: <FaHistory /> },
+    { id: 'ai-advisor', label: 'AI Study Advisor', icon: <FaRobot /> },
+    { id: 'assessment', label: 'Dynamic Assessment', icon: <FaBrain /> },
     { id: 'profile', label: 'My Profile', icon: <FaUser /> },
   ];
 
@@ -217,7 +223,23 @@ const StudentDashboard = () => {
                      <StudentProfile onBack={() => setView('dashboard')} />
                   </div>
                )}
-               
+
+               {/* ASSESSMENT VIEW */}
+               {!loading && view === 'assessment' && (
+                  <div className="max-w-6xl mx-auto w-full">
+                     <StudentAssessment onBack={() => setView('dashboard')} />
+                  </div>
+               )}
+
+
+               {/* AI ADVISOR VIEW */}
+               {!loading && view === 'ai-advisor' && (
+                  <div className="max-w-6xl mx-auto">
+                     <AILearningPath onBack={() => setView('dashboard')} />
+                  </div>
+               )}
+
+
              </>
            )}
         </main>
