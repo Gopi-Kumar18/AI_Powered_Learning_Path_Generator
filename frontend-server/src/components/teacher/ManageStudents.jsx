@@ -9,7 +9,6 @@ const ManageStudents = ({ onBack }) => {
 
   useEffect(() => {
     const fetchStudents = async () => {
-      // Hardcoded for now; later use the logged-in teacher's ID
       const data = await getTeacherStudents("TEACHER-001");
       setStudents(data);
       setLoading(false);
@@ -17,76 +16,74 @@ const ManageStudents = ({ onBack }) => {
     fetchStudents();
   }, []);
 
-  // Filter students based on the search bar input
   const filteredStudents = students.filter(s => 
     s.studentId.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   return (
-    <div className="bg-gray-900 border border-gray-800 rounded-2xl p-8 shadow-2xl animate-fade-in-up min-h-[500px]">
+    <div className="bg-white border border-slate-200 rounded-3xl p-10 shadow-sm animate-fade-in-up min-h-[500px]">
       
-      {/* Header */}
-      <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-8 border-b border-gray-800 pb-6 gap-4">
+      <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-8 pb-6 gap-4">
         <div>
-          <h2 className="text-2xl font-bold text-white flex items-center gap-3">
-            <FaUserGraduate className="text-cyan-500" /> Manage Students
+          <h2 className="text-3xl font-black text-slate-800 flex items-center gap-3">
+            <FaUserGraduate className="text-blue-600" /> Manage Students
           </h2>
-          <p className="text-sm text-gray-400 mt-1">View attendance records for students enrolled in your classes.</p>
+          <p className="text-slate-500 mt-2 font-medium">View attendance records for students enrolled in your classes.</p>
         </div>
-        <button onClick={onBack} className="text-gray-400 hover:text-cyan-400 flex items-center gap-2 transition bg-gray-800 px-4 py-2 rounded-lg">
-          <FaArrowLeft /> Dashboard
-        </button>
+        {onBack && (
+          <button onClick={onBack} className="text-slate-500 hover:text-blue-600 font-bold flex items-center gap-2 transition bg-slate-50 hover:bg-slate-100 px-4 py-2 rounded-xl">
+            <FaArrowLeft /> Dashboard
+          </button>
+        )}
       </div>
 
-      {/* Search Bar */}
-      <div className="relative mb-6">
-        <FaSearch className="absolute left-4 top-3.5 text-gray-500" />
+      <div className="relative mb-8">
+        <FaSearch className="absolute left-4 top-4 text-slate-400" />
         <input 
           type="text" 
           placeholder="Search by Student ID (e.g., 12321662)..." 
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="w-full bg-gray-950 border border-gray-800 rounded-xl py-3 pl-12 pr-4 text-gray-100 placeholder-gray-600 focus:outline-none focus:border-cyan-500 transition-colors"
+          className="w-full bg-slate-50 border border-slate-200 rounded-xl py-3 pl-12 pr-4 text-slate-800 font-bold placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all"
         />
       </div>
 
-      {/* Student List */}
       {loading ? (
-        <div className="text-center text-gray-500 py-10 animate-pulse">Loading student records...</div>
+        <div className="text-center text-slate-400 py-10 animate-pulse font-bold">Loading student records...</div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredStudents.length > 0 ? (
             filteredStudents.map((student, idx) => (
-              <div key={idx} className="bg-gray-800/50 border border-gray-700 hover:border-cyan-500/50 rounded-xl p-5 transition-all flex flex-col justify-between">
-                <div className="flex items-center gap-4 mb-4">
-                  <div className="w-12 h-12 bg-cyan-900/30 text-cyan-400 rounded-full flex items-center justify-center text-xl font-bold border border-cyan-800/50">
+              <div key={idx} className="bg-slate-50 border border-slate-200 hover:border-blue-400 hover:shadow-md rounded-2xl p-6 transition-all flex flex-col justify-between">
+                <div className="flex items-center gap-4 mb-6">
+                  <div className="w-14 h-14 bg-white text-blue-600 rounded-full flex items-center justify-center text-xl font-black border border-slate-200 shadow-sm">
                     {student.studentId.substring(0, 2)}
                   </div>
                   <div>
-                    <h3 className="text-white font-bold text-lg">{student.studentId}</h3>
-                    <p className="text-xs text-gray-400 flex items-center gap-1 mt-0.5">
+                    <h3 className="text-slate-800 font-bold text-xl">{student.studentId}</h3>
+                    <p className="text-xs font-bold text-slate-400 flex items-center gap-1 mt-1">
                       <FaCheckCircle className="text-green-500" /> Biometric Verified
                     </p>
                   </div>
                 </div>
                 
-                <div className="flex justify-between items-end border-t border-gray-700/50 pt-4 mt-2">
+                <div className="flex justify-between items-end border-t border-slate-200 pt-4 mt-2">
                   <div>
-                    <p className="text-[10px] text-gray-500 uppercase tracking-wider font-bold mb-1">Total Attended</p>
-                    <p className="text-2xl font-black text-white">{student.totalAttended}</p>
+                    <p className="text-[10px] text-slate-400 uppercase tracking-wider font-bold mb-1">Total Attended</p>
+                    <p className="text-3xl font-black text-blue-600">{student.totalAttended}</p>
                   </div>
                   <div className="text-right">
-                    <p className="text-[10px] text-gray-500 uppercase tracking-wider font-bold mb-1 flex items-center justify-end gap-1">
+                    <p className="text-[10px] text-slate-400 uppercase tracking-wider font-bold mb-1 flex items-center justify-end gap-1">
                       <FaClock /> Last Seen
                     </p>
-                    <p className="text-sm text-gray-300 font-mono">{student.lastSeenDate}</p>
-                    <p className="text-xs text-gray-500 font-mono">{student.lastSeenTime}</p>
+                    <p className="text-sm font-bold text-slate-600 font-mono">{student.lastSeenDate}</p>
+                    <p className="text-xs font-bold text-slate-400 font-mono">{student.lastSeenTime}</p>
                   </div>
                 </div>
               </div>
             ))
           ) : (
-            <div className="col-span-full text-center py-10 text-gray-500">
+            <div className="col-span-full text-center py-10 font-bold text-slate-400">
               No students found matching "{searchQuery}".
             </div>
           )}
@@ -97,3 +94,6 @@ const ManageStudents = ({ onBack }) => {
 };
 
 export default ManageStudents;
+
+
+

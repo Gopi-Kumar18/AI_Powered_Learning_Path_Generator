@@ -1,209 +1,163 @@
-import { useState } from 'react';
-import { FaChalkboardTeacher, FaChartPie, FaHistory, FaUserGraduate, FaSignOutAlt, FaArrowLeft } from 'react-icons/fa';
-import CreateSession from '../components/teacher/CreateSession'; 
+import { useState, useEffect } from 'react';
+import { FaChalkboardTeacher, FaQrcode, FaHistory, FaChartBar, FaUser, FaSignOutAlt, FaUserGraduate, FaBars } from 'react-icons/fa';
+import { useAuth } from '../context/AuthContext';
+
+import TeacherHome from '../components/teacher/TeacherHome';
+import CreateSession from '../components/teacher/CreateSession';
+import LiveQR from '../components/teacher/LiveQR';
+import LiveSessionMonitor from '../components/teacher/LiveSessionMonitor';
 import SessionHistory from '../components/teacher/SessionHistory';
-import LiveQR from '../components/teacher/LiveQR';             
-import LiveSessionMonitor from '../components/teacher/LiveSessionMonitor'; 
 import TeacherAnalytics from '../components/teacher/TeacherAnalytics';
 import ManageStudents from '../components/teacher/ManageStudents';
+import TeacherProfile from '../components/teacher/TeacherProfile';
 
 const TeacherDashboard = () => {
-  const [view, setView] = useState('dashboard'); // 'dashboard', 'create', 'live'
+  const { user, logout } = useAuth();
+  const [view, setView] = useState('dashboard');
+  const [currentDate, setCurrentDate] = useState('');
   const [activeSessionId, setActiveSessionId] = useState(null);
-  const [notification, setNotification] = useState(null);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
-  // Helper to handle feature clicks
-  const handleFeatureClick = (feature) => {
-    if (feature === 'start_session')  setView('create'); 
-    else if (feature === 'History') setView('history'); 
-    else if (feature === 'Analytics') setView('analytics');
-    else if (feature === 'Students') setView('students');
-    else {
-      setNotification(`${feature} is currently under development. Available soon!`);
-      setTimeout(() => setNotification(null), 3000);
-    }
-  };
+  useEffect(() => {
+    const options = { weekday: 'long', month: 'short', day: 'numeric', year: 'numeric' };
+    setCurrentDate(new Date().toLocaleDateString('en-US', options).toUpperCase());
+  }, []);
 
-  const handleSessionStart = (id) => {
-    setActiveSessionId(id);
-    setView('live');
-  };
-
-  const handleEndSession = () => {
-    setActiveSessionId(null);
-    setView('dashboard');
-  };
+  const navItems = [
+    { id: 'dashboard', label: 'Dashboard', icon: <FaChalkboardTeacher /> },
+    { id: 'start-session', label: 'Start Session', icon: <FaQrcode /> },
+    { id: 'history', label: 'Session History', icon: <FaHistory /> },
+    { id: 'manage-students', label: 'Manage Students', icon: <FaUserGraduate /> },
+    { id: 'analytics', label: 'Student Analytics', icon: <FaChartBar /> },
+    { id: 'profile', label: 'My Profile', icon: <FaUser /> },
+  ];
 
   return (
-    <div className="min-h-screen bg-gray-950 text-white font-sans selection:bg-cyan-500 selection:text-black">
+    <div className="flex h-screen bg-slate-50 font-sans overflow-hidden">
       
-      {/* 1. TOP NAVIGATION (Glassmorphism) */}
-      <nav className="fixed top-0 w-full z-50 bg-gray-900/80 backdrop-blur-md border-b border-gray-800">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between h-16 items-center">
-            {/* Logo */}
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 bg-cyan-500 rounded-lg flex items-center justify-center shadow-[0_0_15px_rgba(6,182,212,0.5)]">
-                <span className="font-bold text-black text-xl">S</span>
-              </div>
-              <span className="text-xl font-bold tracking-tight text-gray-100">SALS <span className="text-cyan-400 font-light">Teacher</span></span>
-            </div>
-
-            {/* Profile / Logout */}
-            <button className="flex items-center gap-2 text-gray-400 hover:text-red-400 transition-colors text-sm font-medium">
-              <span className="hidden sm:block">Logout</span>
-              <FaSignOutAlt />
-            </button>
+      {/* SIDEBAR */}
+      <div className={`bg-slate-900 text-white flex flex-col justify-between shadow-2xl z-20 transition-all duration-300 whitespace-nowrap ${isSidebarOpen ? 'w-64' : 'w-0 overflow-hidden'}`}>
+        <div>
+          <div className="h-20 flex items-center gap-3 px-6 border-b border-slate-800 bg-slate-900/50">
+            <div className="min-w-[32px] w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center font-bold text-white shadow-lg shadow-blue-500/30">S</div>
+            <h1 className="text-xl font-black tracking-wider">SALS</h1>
           </div>
+          <nav className="p-4 space-y-2 mt-4">
+            {navItems.map((item) => (
+              <button
+                key={item.id}
+                onClick={() => setView(item.id)}
+                className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold transition-all duration-200
+                  ${view === item.id ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/30 translate-x-1' : 'text-slate-400 hover:bg-slate-800 hover:text-white hover:translate-x-1'}`}
+              >
+                <span className="text-lg">{item.icon}</span>
+                {item.label}
+              </button>
+            ))}
+          </nav>
         </div>
-      </nav>
-
-      {/* 2. MAIN CONTENT AREA */}
-      <main className="pt-24 pb-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-        
-        {/* Notification Toast */}
-        {notification && (
-          <div className="fixed top-20 right-4 bg-gray-800 border-l-4 border-cyan-500 text-cyan-100 p-4 rounded shadow-2xl animate-fade-in-down z-50">
-            <p className="font-medium">🚀 {notification}</p>
-          </div>
-        )}
-
-        {/* VIEW: DASHBOARD GRID */}
-        {view === 'dashboard' && (
-          <div className="animate-fade-in-up">
-            <header className="mb-10">
-              <h1 className="text-3xl sm:text-4xl font-extrabold text-white mb-2">
-                Welcome back, <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-600">Professor</span>
-              </h1>
-              <p className="text-gray-400">Manage your classes and attendance efficiently.</p>
-            </header>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {/* Card 1: Start Session (Active) */}
-              <DashboardCard 
-                icon={<FaChalkboardTeacher className="text-3xl text-black" />}
-                title="Start Live Class"
-                desc="Generate QR code for today's attendance."
-                active={true}
-                onClick={() => handleFeatureClick('start_session')}
-              />
-
-              {/* Card 2: Analytics (Inactive) */}
-              <DashboardCard 
-                icon={<FaChartPie className="text-3xl text-gray-500" />}
-                title="Attendance Analytics"
-                desc="View graphs and monthly reports."
-                active={true}
-                onClick={() => handleFeatureClick('Analytics')}
-              />
-
-              {/* Card 3: History (Inactive) */}
-              <DashboardCard 
-                icon={<FaHistory className="text-3xl text-gray-500" />}
-                title="Session History"
-                desc="Review past classes and logs."
-                active={true}
-                onClick={() => handleFeatureClick('History')}
-              />
-
-              {/* Card 4: Students (Inactive) */}
-              <DashboardCard 
-                icon={<FaUserGraduate className="text-3xl text-gray-500" />}
-                title="Manage Students"
-                desc="View profiles and edit details."
-                active={true}
-                onClick={() => handleFeatureClick('Students')}
-              />
+        <div className="p-4 border-t border-slate-800 bg-slate-900/50">
+          <div className="flex items-center gap-3 mb-4 px-2">
+            <div className="min-w-[40px] w-10 h-10 rounded-full bg-gradient-to-tr from-blue-500 to-indigo-500 flex items-center justify-center font-bold text-white shadow-md">
+              {user?.name?.charAt(0) || 'T'}
+            </div>
+            <div className="overflow-hidden">
+              <p className="font-bold truncate text-sm">{user?.name || 'Professor'}</p>
+              <p className="text-xs text-slate-400 truncate">ID: {user?.userId}</p>
             </div>
           </div>
-        )}
+          <button onClick={logout} className="w-full flex items-center justify-center gap-2 bg-slate-800 hover:bg-red-500/10 text-slate-400 hover:text-red-500 py-3 rounded-xl font-bold transition-colors">
+            <FaSignOutAlt /> Sign Out
+          </button>
+        </div>
+      </div>
 
-        {/* VIEW: CREATE SESSION FORM */}
-        {view === 'create' && (
-          <div className="max-w-2xl mx-auto animate-fade-in-up">
-            <button onClick={() => setView('dashboard')} className="flex items-center text-gray-400 hover:text-cyan-400 mb-6 transition">
-              <FaArrowLeft className="mr-2" /> Back to Dashboard
+      <div className="flex-1 flex flex-col h-screen overflow-hidden relative min-w-0">
+        
+        {/* HEADER */}
+        <div className="h-20 px-8 flex justify-between items-center bg-white/80 backdrop-blur-md border-b border-slate-200 z-10">
+          <div className="flex items-center gap-4">
+            <button 
+              onClick={() => setIsSidebarOpen(!isSidebarOpen)} 
+              className="text-slate-400 hover:text-blue-600 transition-colors p-2 hover:bg-blue-50 rounded-lg"
+            >
+              <FaBars className="text-2xl" />
             </button>
-            <CreateSession onSessionStarted={handleSessionStart} />
+            <h2 className="text-2xl font-black text-slate-800 capitalize tracking-tight hidden sm:block">
+              {view.replace('-', ' ')}
+            </h2>
           </div>
-        )}
+          <span className="text-sm font-bold text-slate-400 bg-slate-100 px-4 py-2 rounded-full hidden sm:block">{currentDate}</span>
+        </div>
 
-        {/* VIEW: LIVE QR */}
-        {view === 'live' && (
-          <div className="max-w-4xl mx-auto animate-fade-in-up">
-             <div className="flex justify-between items-center mb-6">
-                <button onClick={handleEndSession} className="flex items-center text-red-400 hover:text-red-300 transition bg-red-500/10 px-4 py-2 rounded-lg border border-red-500/30">
-                  <FaArrowLeft className="mr-2" /> End Session
-                </button>
-                <span className="text-green-400 flex items-center gap-2">
-                  <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span> Live
-                </span>
-             </div>
-             
-             <div className="grid grid-cols-1 lg:grid-cols-1.3 gap-8 items-start">
-                 <LiveQR sessionId={activeSessionId} />
-                 <div className="h-[500px]"> {/* Forces monitor to match QR height */}
+        {/* SCROLLABLE VIEW CONTAINER */}
+        <div className="flex-1 overflow-y-auto p-4 md:p-8 custom-scrollbar">
+          
+          {view === 'dashboard' && (
+            <div className="max-w-6xl mx-auto animate-fade-in-up">
+              <TeacherHome onViewChange={setView} />
+            </div>
+          )}
+
+          {/*Teacher Session Creation UI + LiveQR Code Generator + Live Session Monitor + */}
+          {view === 'start-session' && (
+            <div className="max-w-6xl mx-auto animate-fade-in-up">
+              {!activeSessionId ? (
+                <div className="max-w-3xl mx-auto">
+                   <CreateSession onSessionStarted={(id) => setActiveSessionId(id)} />
+                </div>
+              ) : (
+                <div className="space-y-6 animate-fade-in-up">
+                  <div className="flex justify-between items-center bg-white p-4 rounded-2xl shadow-sm border border-slate-200">
+                     <p className="font-bold text-slate-500 px-4">Session is Live</p>
+                     <button 
+                       onClick={() => setActiveSessionId(null)} 
+                       className="bg-red-50 text-red-600 hover:bg-red-500 hover:text-white border border-red-200 px-6 py-2 rounded-xl font-bold transition-all shadow-sm"
+                     >
+                       End Live Session
+                     </button>
+                  </div>
+                  
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                     <LiveQR sessionId={activeSessionId} />
                      <LiveSessionMonitor sessionId={activeSessionId} />
-                 </div>
-             </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
 
-          </div>
-        )}
+          {/** Session History */}
+          {view === 'history' && (
+            <div className="max-w-6xl mx-auto animate-fade-in-up">
+              <SessionHistory onBack={() => setView('dashboard')} />
+            </div>
+          )}
+          
+          {/* Manage Students */}
+          {view === 'manage-students' && (
+            <div className="max-w-6xl mx-auto animate-fade-in-up">
+               <ManageStudents onBack={() => setView('dashboard')} />
+            </div>
+          )}
 
-        {/* VIEW: SESSION HISTORY */}
-        {view === 'history' && (
-          <div className="max-w-6xl mx-auto">
-            <SessionHistory onBack={() => setView('dashboard')} />
-         </div>
-        )}
+          {/* Student Analytics */}
+          {view === 'analytics' && (
+            <div className="max-w-6xl mx-auto animate-fade-in-up">
+              <TeacherAnalytics onBack={() => setView('dashboard')} />
+            </div>
+          )}
 
+          {/* Teacher Profile */}
+          {view === 'profile' && (
+            <TeacherProfile />
+          )}
 
-        {/* VIEW: ANALYTICS */}
-        {view === 'analytics' && (
-          <div className="max-w-6xl mx-auto">
-            <TeacherAnalytics onBack={() => setView('dashboard')} />
-          </div>
-        )}
-
-        {/* VIEW: MANAGE STUDENTS */}
-        {view === 'students' && (
-          <div className="max-w-6xl mx-auto">
-            <ManageStudents onBack={() => setView('dashboard')} />
-          </div>
-        )}
-
-      </main>
+        </div>
+      </div>
     </div>
   );
 };
-
-// Reusable Card Component
-const DashboardCard = ({ icon, title, desc, active, onClick }) => (
-  <div 
-    onClick={onClick}
-    className={`
-      relative group p-6 rounded-2xl border transition-all duration-300 cursor-pointer overflow-hidden
-      ${active 
-        ? 'bg-gray-900 border-gray-700 hover:border-cyan-500 hover:shadow-[0_0_20px_rgba(6,182,212,0.15)]' 
-        : 'bg-gray-900/50 border-gray-800 hover:bg-gray-900 opacity-75 grayscale hover:grayscale-0'}
-    `}
-  >
-    <div className={`
-      w-14 h-14 rounded-xl flex items-center justify-center mb-4 transition-colors
-      ${active ? 'bg-cyan-500 shadow-lg shadow-cyan-500/20' : 'bg-gray-800'}
-    `}>
-      {icon}
-    </div>
-    <h3 className="text-xl font-bold text-white mb-2">{title}</h3>
-    <p className="text-sm text-gray-400">{desc}</p>
-    
-    {!active && (
-      <div className="absolute top-4 right-4 px-2 py-1 bg-gray-800 text-xs font-mono text-gray-500 rounded border border-gray-700">
-        SOON
-      </div>
-    )}
-  </div>
-);
 
 export default TeacherDashboard;
 

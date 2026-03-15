@@ -1,19 +1,17 @@
 import { useState, useEffect } from 'react';
-import { FaCalendarAlt, FaUsers, FaArrowLeft, FaEye, FaCheckCircle } from 'react-icons/fa';
+import { FaCalendarAlt, FaUsers, FaArrowLeft, FaEye, FaCheckCircle, FaDownload } from 'react-icons/fa';
 import { getTeacherSessions, getLiveSessionLogs, downloadAttendanceCSV } from '../../services/qrAttendanceService';
 
 const SessionHistory = ({ onBack }) => {
   const [sessions, setSessions] = useState([]);
   const [loading, setLoading] = useState(true);
   
-  // State for detailed view
   const [selectedSession, setSelectedSession] = useState(null);
   const [sessionLogs, setSessionLogs] = useState([]);
   const [logsLoading, setLogsLoading] = useState(false);
 
   useEffect(() => {
     const fetchHistory = async () => {
-      // Hardcoded TEACHER-001 for now until auth is fully dynamic
       const data = await getTeacherSessions("TEACHER-001");
       setSessions(data);
       setLoading(false);
@@ -30,97 +28,98 @@ const SessionHistory = ({ onBack }) => {
   };
 
   return (
-    <div className="bg-gray-900 border border-gray-800 rounded-2xl p-8 shadow-2xl animate-fade-in-up">
-      <div className="flex items-center justify-between mb-8 border-b border-gray-800 pb-4">
-        <h2 className="text-2xl font-bold text-white flex items-center gap-3">
-          <FaCalendarAlt className="text-cyan-500" /> Session History
+    <div className="bg-white border border-slate-200 rounded-3xl p-10 shadow-sm animate-fade-in-up">
+      <div className="flex items-center justify-between mb-8 pb-4">
+        <h2 className="text-3xl font-black text-slate-800 flex items-center gap-3">
+          <FaCalendarAlt className="text-blue-600" /> Session History
         </h2>
         {selectedSession ? (
-           <button onClick={() => setSelectedSession(null)} className="text-gray-400 hover:text-cyan-400 flex items-center gap-2 transition">
+           <button onClick={() => setSelectedSession(null)} className="text-slate-500 hover:text-blue-600 font-bold flex items-center gap-2 transition bg-slate-50 px-4 py-2 rounded-xl">
              <FaArrowLeft /> Back to List
            </button>
-        ) : (
-           <button onClick={onBack} className="text-gray-400 hover:text-cyan-400 flex items-center gap-2 transition">
+        ) : onBack ? (
+           <button onClick={onBack} className="text-slate-500 hover:text-blue-600 font-bold flex items-center gap-2 transition bg-slate-50 px-4 py-2 rounded-xl">
              <FaArrowLeft /> Dashboard
            </button>
-        )}
+        ) : null}
       </div>
 
       {loading ? (
-        <div className="text-center text-gray-500 py-10 animate-pulse">Loading history...</div>
+        <div className="text-center font-bold text-slate-400 py-10 animate-pulse">Loading history...</div>
       ) : selectedSession ? (
-        /* --- DETAILED VIEW --- */
-        <div className="space-y-4">
-           {/* <h3 className="text-lg font-bold text-gray-300 mb-4 font-mono">{selectedSession}</h3> */}
-
-           <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-4 border-b border-gray-800 pb-4">
-              <h3 className="text-lg font-bold text-gray-300 font-mono">ID: {selectedSession}</h3>
-              
+        /* DETAILED VIEW */
+        <div className="space-y-6">
+           <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-4 bg-slate-50 p-6 rounded-2xl border border-slate-200">
+              <div>
+                <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Session Details</p>
+                <h3 className="text-xl font-black text-slate-800 font-mono">{selectedSession}</h3>
+              </div>
               <button 
                 onClick={() => downloadAttendanceCSV(selectedSession)}
-                className="bg-green-600 hover:bg-green-500 text-white px-4 py-2 rounded-lg font-bold text-sm transition-colors shadow-lg shadow-green-900/20 flex items-center gap-2"
+                className="bg-green-500 hover:bg-green-600 text-white px-5 py-3 rounded-xl font-bold transition-all shadow-lg shadow-green-500/30 flex items-center gap-2 hover:scale-105"
               >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
-                Export CSV
+                <FaDownload /> Export CSV
               </button>
            </div>
 
            {logsLoading ? (
-              <div className="text-center text-gray-500">Fetching attendance records...</div>
+              <div className="text-center font-bold text-slate-400 py-10">Fetching attendance records...</div>
            ) : sessionLogs.length > 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                  {sessionLogs.map((log, i) => (
-                    <div key={i} className="bg-gray-800 p-4 rounded-xl flex justify-between items-center border border-gray-700">
+                    <div key={i} className="bg-white p-5 rounded-2xl flex justify-between items-center border border-slate-200 shadow-sm hover:border-blue-300 transition-colors">
                        <div className="flex items-center gap-3">
-                          <FaCheckCircle className="text-green-500" />
-                          <span className="font-bold text-gray-200">{log.studentId}</span>
+                          <FaCheckCircle className="text-green-500 text-xl" />
+                          <span className="font-bold text-slate-800 text-lg">{log.studentId}</span>
                        </div>
-                       <span className="text-sm text-gray-400 bg-gray-900 px-3 py-1 rounded-lg">{log.time}</span>
+                       <span className="text-xs font-bold text-slate-500 bg-slate-100 px-3 py-1 rounded-lg">{log.time}</span>
                     </div>
                  ))}
               </div>
            ) : (
-              <div className="text-center text-gray-500 py-10">No students attended this session.</div>
+              <div className="text-center font-bold text-slate-400 py-20 bg-slate-50 rounded-2xl border border-dashed border-slate-300">
+                 No students attended this session.
+              </div>
            )}
         </div>
       ) : (
-        /* --- LIST VIEW --- */
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm text-gray-400">
-            <thead className="text-xs text-gray-500 uppercase bg-gray-800/50">
+        /* LIST VIEW */
+        <div className="overflow-hidden border border-slate-200 rounded-2xl">
+          <table className="w-full text-left text-sm">
+            <thead className="text-xs text-slate-500 uppercase bg-slate-50 border-b border-slate-200">
               <tr>
-                <th className="px-6 py-4 rounded-tl-xl">Subject & Date</th>
-                <th className="px-6 py-4">Session ID</th>
-                <th className="px-6 py-4 text-center">Type</th>
-                <th className="px-6 py-4 text-center">Present</th>
-                <th className="px-6 py-4 text-right rounded-tr-xl">Action</th>
+                <th className="px-6 py-5 font-bold tracking-wider">Subject & Date</th>
+                <th className="px-6 py-5 font-bold tracking-wider">Session ID</th>
+                <th className="px-6 py-5 font-bold tracking-wider text-center">Type</th>
+                <th className="px-6 py-5 font-bold tracking-wider text-center">Present</th>
+                <th className="px-6 py-5 font-bold tracking-wider text-right">Action</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody className="divide-y divide-slate-100 bg-white">
               {sessions.map((s, idx) => (
-                <tr key={idx} className="border-b border-gray-800/50 hover:bg-gray-800/30 transition-colors">
+                <tr key={idx} className="hover:bg-slate-50/50 transition-colors">
                   <td className="px-6 py-4">
-                    <p className="font-bold text-gray-200 text-base">{s.subject}</p>
-                    <p className="text-xs mt-1">{s.date} • {s.time}</p>
+                    <p className="font-black text-slate-800 text-base">{s.subject}</p>
+                    <p className="text-xs font-bold text-slate-400 mt-1">{s.date} • {s.time}</p>
                   </td>
-                  <td className="px-6 py-4 font-mono text-xs">{s.sessionId}</td>
+                  <td className="px-6 py-4 font-mono font-bold text-slate-600 text-xs">{s.sessionId}</td>
                   <td className="px-6 py-4 text-center">
                     {s.isMakeup ? (
-                       <span className="bg-purple-500/10 text-purple-400 px-3 py-1 rounded-full text-xs font-bold border border-purple-500/20">Makeup</span>
+                       <span className="bg-purple-100 text-purple-700 px-3 py-1 rounded-full text-xs font-bold border border-purple-200">Makeup</span>
                     ) : (
-                       <span className="bg-blue-500/10 text-blue-400 px-3 py-1 rounded-full text-xs font-bold border border-blue-500/20">Normal</span>
+                       <span className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-xs font-bold border border-blue-200">Normal</span>
                     )}
                   </td>
                   <td className="px-6 py-4 text-center">
                     <div className="flex items-center justify-center gap-2">
-                       <FaUsers className="text-gray-500" />
-                       <span className="font-bold text-gray-300 text-lg">{s.totalPresent}</span>
+                       <FaUsers className="text-slate-400" />
+                       <span className="font-black text-slate-700 text-lg">{s.totalPresent}</span>
                     </div>
                   </td>
                   <td className="px-6 py-4 text-right">
                     <button 
                       onClick={() => handleViewDetails(s.sessionId)}
-                      className="bg-gray-800 hover:bg-cyan-600 hover:text-white text-cyan-500 p-3 rounded-xl transition-all duration-300"
+                      className="bg-slate-100 hover:bg-blue-600 hover:text-white text-blue-600 p-3 rounded-xl transition-all shadow-sm"
                     >
                       <FaEye />
                     </button>
@@ -129,7 +128,7 @@ const SessionHistory = ({ onBack }) => {
               ))}
               {sessions.length === 0 && (
                 <tr>
-                   <td colSpan="5" className="text-center py-10">No sessions recorded yet.</td>
+                   <td colSpan="5" className="text-center font-bold text-slate-400 py-10">No sessions recorded yet.</td>
                 </tr>
               )}
             </tbody>
@@ -141,3 +140,6 @@ const SessionHistory = ({ onBack }) => {
 };
 
 export default SessionHistory;
+
+
+
