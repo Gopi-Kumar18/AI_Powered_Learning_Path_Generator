@@ -3,7 +3,7 @@ import { FaUsers, FaChalkboardTeacher, FaServer, FaUserPlus, FaSignOutAlt } from
 import { getSystemStats, registerUser } from '../../services/adminService';
 import { useAuth } from '../../context/AuthContext';
 import { uploadSubjectSyllabus } from '../../services/adminService';
-import { SystemAudit } from "./SystemAudit"
+import  SystemAudit  from "./SystemAudit"
 
 
 
