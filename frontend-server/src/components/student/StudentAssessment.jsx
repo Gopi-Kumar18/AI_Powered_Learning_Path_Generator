@@ -9,11 +9,11 @@ const StudentAssessment = ({ onBack }) => {
   
 
     const subjects = [
-    { id: 1, name: "OS" },
+    { id: 5, name: "OS" },
     { id: 2, name: "DSA" },
     { id: 3, name: "OS LAB" },
     { id: 4, name: "Verbal Ability" },
-    { id: 5, name: "Java Programming" },
+    { id: 1, name: "Java Programming" },
     { id: 6, name: "Computer Networks" },
   ];
 
