@@ -3,6 +3,7 @@ import ReactMarkdown from 'react-markdown';
 import { FaRobot, FaMagic, FaBookOpen, FaArrowLeft, FaBrain } from 'react-icons/fa';
 import { getAILearningPath } from '../../services/qrAttendanceService';
 import { useAuth } from '../../context/AuthContext';
+import html2pdf from 'html2pdf.js';
 
 const AILearningPath = ({ onBack, onNavigateToAssessment }) => {
   const { user } = useAuth();
@@ -27,6 +28,22 @@ const AILearningPath = ({ onBack, onNavigateToAssessment }) => {
       setRoadmap(result.data.aiGeneratedRoadmap);
     } 
     setLoading(false);
+  };
+
+  const handleDownloadPDF = () => {
+    setIsDownloading(true);
+    const element = roadmapRef.current;
+
+    const options = {
+      margin:       [15, 15, 15, 15], 
+      filename:     `${selectedSubject}_AI_Roadmap.pdf`.replace(/\s+/g, '_'),
+      image:        { type: 'jpeg', quality: 0.98 },
+      html2canvas:  { scale: 2, useCORS: true }, 
+      jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    };
+    html2pdf().set(options).from(element).save().then(() => {
+      setIsDownloading(false);
+    });
   };
 
   return (
@@ -72,6 +89,29 @@ const AILearningPath = ({ onBack, onNavigateToAssessment }) => {
 
       {/* AI Output Canvas */}
       <div className="bg-white min-h-[400px] rounded-2xl shadow-sm border border-gray-100 p-8">
+
+        {/* NEW: Download Button - Only shows if roadmap exists */}
+        {roadmap && (
+          <div className="absolute top-6 right-6 z-10">
+            <button 
+              onClick={handleDownloadPDF}
+              disabled={isDownloading}
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg font-bold text-sm transition-all shadow-sm border ${
+                isDownloading 
+                ? 'bg-slate-100 text-slate-400 border-slate-200 cursor-not-allowed'
+                : 'bg-white text-blue-600 border-blue-200 hover:bg-blue-50 hover:border-blue-300'
+              }`}
+            >
+              {isDownloading ? (
+                <><div className="w-4 h-4 border-2 border-slate-300 border-t-slate-500 rounded-full animate-spin"></div> Saving PDF...</>
+              ) : (
+                <><FaFilePdf className="text-red-500 text-lg" /> Download as PDF</>
+              )}
+            </button>
+          </div>
+        )}
+
+        
         {loading ? (
            <div className="h-full flex flex-col items-center justify-center text-slate-400 space-y-4 py-20">
              <div className="w-12 h-12 border-4 border-purple-200 border-t-purple-600 rounded-full animate-spin"></div>
@@ -83,6 +123,15 @@ const AILearningPath = ({ onBack, onNavigateToAssessment }) => {
              <p className="font-bold text-lg animate-pulse">AI is analyzing your attendance and building a custom plan...</p>
            </div>
         ) : roadmap ? (
+          /* NEW: We attached 'roadmapRef' to this div so the PDF library knows what to capture! */
+           <div ref={roadmapRef} className="pt-4 pb-10 px-2">
+             
+             {/* PDF Header - Only visible in the downloaded PDF to give it context */}
+             <div className="mb-8 border-b-2 border-slate-100 pb-6">
+                <h1 className="text-4xl font-black text-slate-800 tracking-tight">{selectedSubject}</h1>
+                <p className="text-slate-500 font-bold mt-2 uppercase tracking-wider">SALS Custom Learning Roadmap</p>
+             </div>
+
           <div className="prose prose-slate max-w-none 
               /* Main Headings (Weeks) */
               prose-h2:text-3xl prose-h2:font-black prose-h2:text-blue-700 prose-h2:mt-12 prose-h2:mb-6
@@ -99,6 +148,7 @@ const AILearningPath = ({ onBack, onNavigateToAssessment }) => {
            ">
              <ReactMarkdown>{roadmap}</ReactMarkdown>
            </div>
+          </div>
         ) : selectedSubject ? (
            <div className="h-full flex flex-col items-center justify-center text-slate-400 py-20">
              <FaBookOpen className="text-5xl mb-4 opacity-20" />
