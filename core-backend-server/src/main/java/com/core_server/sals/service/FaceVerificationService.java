@@ -23,7 +23,7 @@ public class FaceVerificationService {
     private final String AI_SERVER_URL = "http://localhost:8000/verify-face";
     private final RestTemplate restTemplate = new RestTemplate();
 
-    // 1. Face Validation Service method for veryfying a student's face(FastAPI Backend) -----
+    // ----- 1. Face Validation Service method for veryfying a student's face(FastAPI Backend) -----
     public boolean verifyStudentFace(String studentId, MultipartFile selfieFile) {
         try {
             // 1. Prepare the Headers (We are sending a File)

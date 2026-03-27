@@ -7,15 +7,15 @@ import org.springframework.stereotype.Service;
 public class GeofencingService {
 
     // ALLOWED RADIUS in meters (e.g., 50 meters around the class)
-    private static final double ALLOWED_RADIUS_METERS = 1000.0;
+    private static final double ALLOWED_RADIUS_METERS = 5000.0;
 
     // LPU 31.256479996291617, 75.70494036822915
-    private static final double CLASS_LAT = 31.25567003530153;
-    private static final double CLASS_LNG = 75.70475791210389;
+//    private static final double CLASS_LAT = 31.25567003530153;
+//    private static final double CLASS_LNG = 75.70475791210389;
 
 //  Live
-//    private static final double CLASS_LAT = 31.255255092082944;
-//    private static final double CLASS_LNG = 75.70322245141388;
+    private static final double CLASS_LAT = 31.255255092082944;
+    private static final double CLASS_LNG = 75.70322245141388;
 
 
      // ----- 1. Returns TRUE if student is inside the radius, and FALSE if not -----

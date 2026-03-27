@@ -41,7 +41,7 @@ public class AttendanceController {
             DayOfWeek.TUESDAY, List.of("OS", "Computer Networks", "Java Programming", "DBMS", "DSA"),
             DayOfWeek.WEDNESDAY, List.of("OS", "Computer Networks", "Java Programming"),
             DayOfWeek.THURSDAY, List.of("Java Programming", "DSA", "DSA"),
-            DayOfWeek.FRIDAY, List.of("Verbal Ability", "Computer Networks Lab"),
+            DayOfWeek.FRIDAY, List.of("Verbal Ability", "Computer Networks Lab", "Java Programming"),
 
             // --- TEMPORARY WEEKEND TESTING ---
             DayOfWeek.SATURDAY, List.of("Java Programming", "DSA", "DBMS", "OS"),

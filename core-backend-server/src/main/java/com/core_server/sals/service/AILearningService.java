@@ -42,8 +42,8 @@ public class AILearningService {
 
     // ----- 1. Fetch existing path from MongoDB to save API calls -----
     public LearningPath getLatestPath(String studentId, String subject) {
-        Optional<LearningPath> pathOpt = mongoPathRepo.findTopByStudentIdAndSubjectOrderByGeneratedAtDesc(studentId, subject);
-        return pathOpt.orElse(null);
+        return mongoPathRepo.findTopByStudentIdAndSubjectIgnoreCaseOrderByGeneratedAtDesc(studentId, subject)
+                  .orElse(null);
     }
 
     // ----- 2. Generated a new Comprehensive roadmap for an student based on his Attendance + Quiz Results -----
@@ -57,9 +57,14 @@ public class AILearningService {
         long total = sessionRepo.countValidSessionsBySubjectId(subjectId);
         double attendancePercent = total == 0 ? 0 : ((double) attended / total) * 100;
 
-        String prompt = "You are an expert academic advisor. The student scored " + latestQuiz.getScore() + "/3 on their recent assessment and has an attendance rate of " + Math.round(attendancePercent) + "%. " +
-                "Based on this syllabus: '" + subject.getSyllabusText() + "', generate a highly personalized, 4-week study roadmap in clean Markdown. " +
-                "Address their specific performance blend (e.g., high attendance but low score means they need better study methods; low attendance and low score means they need core fundamentals).";
+        String prompt = "You are an expert academic advisor. The student scored " + latestQuiz.getScore() + "/3 on their assessment and has an attendance rate of " + Math.round(attendancePercent) + "%. " +
+                "Based on this syllabus: '" + subject.getSyllabusText() + "', generate a highly personalized, 4-week/6-week/8-week(depending upon his attendance + quiz results) study roadmap in clean Markdown. " +
+                "CRITICAL FORMATTING RULES: " +
+                "1. Start each week with an H2 header (e.g., '## Week 1: Topic Name'). " +
+                "2. Put a horizontal rule ('---') exactly before every new Week (except the first one). " +
+                "3. Start every single day with an H3 header on a new line (e.g., '### Day 1: Subtopic'). " +
+                "4. Use bullet points for the day's tasks. " +
+                "5. Keep paragraphs short and avoid walls of text.";
 
         String finalMarkdown = callGeminiApi(prompt);
 
