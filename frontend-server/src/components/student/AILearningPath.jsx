@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import ReactMarkdown from 'react-markdown';
-import { FaRobot, FaMagic, FaBookOpen, FaArrowLeft, FaBrain } from 'react-icons/fa';
+import { FaRobot, FaMagic, FaBookOpen, FaArrowLeft, FaBrain, FaFilePdf } from 'react-icons/fa';
 import { getAILearningPath } from '../../services/qrAttendanceService';
 import { useAuth } from '../../context/AuthContext';
 import html2pdf from 'html2pdf.js';
@@ -15,6 +15,9 @@ const AILearningPath = ({ onBack, onNavigateToAssessment }) => {
   const [roadmap, setRoadmap] = useState(null);
   const [loading, setLoading] = useState(false);
   const [generating, setGenerating] = useState(false);
+  const [isDownloading, setIsDownloading] = useState(false);
+
+  const roadmapRef = useRef();
 
   const fetchPath = async (subject) => {
     if (!subject) return;
@@ -28,6 +31,7 @@ const AILearningPath = ({ onBack, onNavigateToAssessment }) => {
       setRoadmap(result.data.aiGeneratedRoadmap);
     } 
     setLoading(false);
+    setGenerating(false);
   };
 
   const handleDownloadPDF = () => {
@@ -123,10 +127,8 @@ const AILearningPath = ({ onBack, onNavigateToAssessment }) => {
              <p className="font-bold text-lg animate-pulse">AI is analyzing your attendance and building a custom plan...</p>
            </div>
         ) : roadmap ? (
-          /* NEW: We attached 'roadmapRef' to this div so the PDF library knows what to capture! */
            <div ref={roadmapRef} className="pt-4 pb-10 px-2">
-             
-             {/* PDF Header - Only visible in the downloaded PDF to give it context */}
+            
              <div className="mb-8 border-b-2 border-slate-100 pb-6">
                 <h1 className="text-4xl font-black text-slate-800 tracking-tight">{selectedSubject}</h1>
                 <p className="text-slate-500 font-bold mt-2 uppercase tracking-wider">SALS Custom Learning Roadmap</p>
