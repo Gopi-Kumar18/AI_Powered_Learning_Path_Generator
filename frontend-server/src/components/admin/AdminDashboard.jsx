@@ -3,6 +3,7 @@ import { FaUsers, FaChalkboardTeacher, FaServer, FaUserPlus, FaSignOutAlt } from
 import { getSystemStats, registerUser } from '../../services/adminService';
 import { useAuth } from '../../context/AuthContext';
 import { uploadSubjectSyllabus } from '../../services/adminService';
+import { SystemAudit } from "./SystemAudit"
 
 
 
@@ -204,6 +205,11 @@ const subjects = [
               {isUploading ? 'Extracting & Saving...' : 'Upload & Parse PDF'}
             </button>
           </form>
+        </div>
+
+        {/* --- NEW: System Audit Section --- */}
+        <div className="lg:col-span-3 mt-4">
+          <SystemAudit />
         </div>
 
       </div>
