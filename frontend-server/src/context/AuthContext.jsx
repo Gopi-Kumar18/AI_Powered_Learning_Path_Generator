@@ -4,37 +4,27 @@ import { createContext, useContext, useState, useEffect } from "react";
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState(() => {
+    const savedUser = localStorage.getItem('sals_user');
+    return savedUser ? JSON.parse(savedUser) : null;
+  });
+
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // On App Start: Check if user is already logged in
-    const token = localStorage.getItem("token");
-    const role = localStorage.getItem("role");
-    const userId = localStorage.getItem("userId");
-    const name = localStorage.getItem("name");
-
-    if (token && role && userId) {
-      setUser({ token, role, userId, name });
-    }
     setLoading(false);
   }, []);
 
   const login = (userData) => {
-  
-    localStorage.setItem("token", userData.token);
-    localStorage.setItem("role", userData.role);
-    localStorage.setItem("userId", userData.userId);
-    localStorage.setItem("name", userData.name);
-
     setUser(userData);
+    localStorage.setItem('sals_user', JSON.stringify(userData));
   };
 
 
   const logout = () => {
-    localStorage.clear();
     setUser(null);
-    window.location.href("/");
+    localStorage.removeItem('sals_user');
+    window.location.href = "/";
   };
 
   return (

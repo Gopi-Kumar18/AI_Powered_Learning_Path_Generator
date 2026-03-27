@@ -83,8 +83,20 @@ const AILearningPath = ({ onBack, onNavigateToAssessment }) => {
              <p className="font-bold text-lg animate-pulse">AI is analyzing your attendance and building a custom plan...</p>
            </div>
         ) : roadmap ? (
-           <div className="prose prose-slate max-w-none prose-headings:text-purple-900 prose-a:text-purple-600 prose-strong:text-slate-800">
-             {/* This magically renders the Gemini Markdown into styled HTML */}
+          <div className="prose prose-slate max-w-none 
+              /* Main Headings (Weeks) */
+              prose-h2:text-3xl prose-h2:font-black prose-h2:text-blue-700 prose-h2:mt-12 prose-h2:mb-6
+              /* Subheadings (Days) */
+              prose-h3:text-xl prose-h3:font-bold prose-h3:text-slate-800 prose-h3:mt-8 prose-h3:mb-3 prose-h3:flex prose-h3:items-center prose-h3:gap-2
+              /* Paragraphs & Text */
+              prose-p:text-slate-600 prose-p:leading-relaxed prose-p:mb-4
+              /* Bullet Points */
+              prose-ul:mt-2 prose-ul:mb-6 prose-li:text-slate-600 prose-li:my-1 prose-li:marker:text-blue-500
+              /* Bold Text Highlighting */
+              prose-strong:text-blue-700
+              /* The Fancy Week Separator Line */
+              prose-hr:my-12 prose-hr:border-t-4 prose-hr:border-dotted prose-hr:border-blue-200
+           ">
              <ReactMarkdown>{roadmap}</ReactMarkdown>
            </div>
         ) : selectedSubject ? (
