@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import java.time.LocalDateTime;
 import java.util.List;
+import com.core_server.sals.entity.Subject;
 
 public interface ClassSessionRepository extends JpaRepository<ClassSession, Long> {
 
@@ -30,4 +31,8 @@ public interface ClassSessionRepository extends JpaRepository<ClassSession, Long
 
     // Fetch all sessions created by a specific teacher, ordered from newest to oldest.
     List<ClassSession> findByTeacherIdOrderByCreatedAtDesc(String teacherId);
+
+    // Counts total rows in the session table tied to this specific subject
+    long countBySubject(Subject subject);
+
 }

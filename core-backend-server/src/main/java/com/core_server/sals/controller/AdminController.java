@@ -5,9 +5,11 @@ import com.core_server.sals.repository.ClassSessionRepository;
 import com.core_server.sals.repository.SubjectRepository;
 import com.core_server.sals.repository.UserRepository;
 import com.core_server.sals.entity.Subject;
+import com.core_server.sals.service.EmailAlertService;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -25,6 +27,7 @@ public class AdminController {
     @Autowired private ClassSessionRepository sessionRepository;
     @Autowired private PasswordEncoder pe;
     @Autowired private SubjectRepository subjectRepository;
+    @Autowired private EmailAlertService emailAlertService;
 
     // ----- 1. Get Admin DB(Dashboard) stats -----
     @GetMapping("/stats")
@@ -78,6 +81,25 @@ public class AdminController {
         } catch (Exception e) {
             e.printStackTrace();
             return Map.of("status", "ERROR", "message", "Failed to parse PDF.");
+        }
+    }
+
+    // ------ 4. Triggers audit of an student ------
+    @PostMapping("/trigger-audit")
+    public ResponseEntity<?> triggerSystemAudit() {
+        try {
+            int emailsDispatched = emailAlertService.runSystemWideAudit();
+
+            return ResponseEntity.ok(Map.of(
+                    "status", "SUCCESS",
+                    "message", "System audit complete.",
+                    "emailsSent", emailsDispatched
+            ));
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body(Map.of(
+                    "status", "ERROR",
+                    "message", "Failed to run audit: " + e.getMessage()
+            ));
         }
     }
 }

@@ -5,6 +5,7 @@ package com.core_server.sals.repository;
 import com.core_server.sals.entity.Attendance;
 import com.core_server.sals.entity.ClassSession;
 import org.springframework.data.jpa.repository.JpaRepository;
+import com.core_server.sals.entity.Subject;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -40,4 +41,5 @@ public interface AttendanceRepository extends JpaRepository<Attendance, Long> {
     // METHOD: Used to populate the teacher's "Analytics" or "Student List" table with aggregate data.
     @Query("SELECT a.studentId, COUNT(a.id), MAX(a.timestamp) FROM Attendance a WHERE a.session.teacherId = :teacherId GROUP BY a.studentId")
     List<Object[]> findStudentStatsForTeacher(@Param("teacherId") String teacherId);
+
 }

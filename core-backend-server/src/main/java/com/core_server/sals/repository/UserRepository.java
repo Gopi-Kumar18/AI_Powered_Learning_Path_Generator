@@ -5,6 +5,7 @@ import com.core_server.sals.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import java.util.Optional;
+import java.util.List;
 
 
 public interface UserRepository extends JpaRepository<User, String> {
@@ -12,4 +13,5 @@ public interface UserRepository extends JpaRepository<User, String> {
     // These use Optional<User>. This is used for Finding records that might not exist. If someone types in the wrong university ID on the login page, this prevents the backend from crashing with a NullPointerException.
     Optional<User> findByCustomId(String userId);
     Optional<User> findByEmail(String email);
+    List<User> findByRole(String role);
 }
