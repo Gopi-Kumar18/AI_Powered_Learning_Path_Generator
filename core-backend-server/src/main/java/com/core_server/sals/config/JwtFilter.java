@@ -4,6 +4,7 @@ package com.core_server.sals.config;
 import com.core_server.sals.util.JwtUtil;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,15 +31,21 @@ public class JwtFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws ServletException, IOException {
 
-        // 1. Get the Header (Authorization: Bearer eyJhbGci...)
-        final String authHeader = request.getHeader("Authorization");
-
         String username = null;
         String jwt = null;
 
-        // 2. Check if Header is valid
-        if (authHeader != null && authHeader.startsWith("Bearer ")) {
-            jwt = authHeader.substring(7);
+        // ----- 1. Read from Cookies instead of Headers -----
+        if (request.getCookies() != null) {
+            for (Cookie cookie : request.getCookies()) {
+                if ("sals_jwt".equals(cookie.getName())) {
+                    jwt = cookie.getValue();
+                    break;
+                }
+            }
+        }
+
+        // ----- 2. Check if Token was found -----
+        if (jwt != null) {
             try {
                 username = jwtUtil.extractUsername(jwt);
             } catch (Exception e) {
@@ -46,7 +53,7 @@ public class JwtFilter extends OncePerRequestFilter {
             }
         }
 
-        // 3. If User is found but not yet authenticated in this Context
+        // ----- 3. If User is found but not yet authenticated in this Context -----
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
 
             if (jwtUtil.validateToken(jwt, username)) {
@@ -58,12 +65,12 @@ public class JwtFilter extends OncePerRequestFilter {
 
                 authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
-                // 4. Set the Authentication in the Context (Log them in!)
+                // ----- 4. Set the Authentication in the Context (Log them in!) -----
                 SecurityContextHolder.getContext().setAuthentication(authToken);
             }
         }
 
-        // 5. Continue the Request
+        // ----- 5. Continue the Request -----
         chain.doFilter(request, response);
     }
 }
