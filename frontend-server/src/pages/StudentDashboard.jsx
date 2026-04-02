@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { FaThLarge, FaQrcode, FaHistory, FaUser, FaSignOutAlt, FaBars, FaChevronRight, FaCheckCircle, FaTimesCircle, FaCalendarAlt, FaExclamationTriangle, FaClock, FaRobot, FaBrain } from 'react-icons/fa';
@@ -7,8 +6,6 @@ import { useAuth } from '../context/AuthContext';
 import StudentProfile from '../components/student/StudentProfile';
 import AILearningPath from '../components/student/AILearningPath';
 import StudentAssessment from '../components/student/StudentAssessment';
-
-
 
 // Timetable UI Data
 const TIMETABLE = {
@@ -29,6 +26,7 @@ const StudentDashboard = () => {
   const [currentDate, setCurrentDate] = useState('');
   const [dashboardData, setDashboardData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null); 
 
   const currentDayName = new Date().toLocaleDateString('en-US', { weekday: 'long' });
   const [selectedDay, setSelectedDay] = useState(DAYS.includes(currentDayName) ? currentDayName : 'Monday');
@@ -41,16 +39,25 @@ const StudentDashboard = () => {
     const fetchStats = async () => {
        if (!user?.userId) return; 
      try {
+      setError(null);
       const token = localStorage.getItem('token');
       const url = `${BASE_API_URL}/api/student/stats/${user.userId}`;
-      // console.log("Fetching from:", url); // Use this for URL debugging.
 
       const res = await axios.get(url, {
           headers: { Authorization: `Bearer ${token}` }
       });
         setDashboardData(res.data);
-      } catch (err) { console.error("Failed to load stats", err); } 
-      finally { setLoading(false); }
+      } catch (err) { 
+        console.error("Failed to load stats", err); 
+        if (err.response?.status === 403) {
+            setError("Your session has expired. Please log out and log back in.");
+        } else {
+            setError("Failed to load dashboard data. Please try again later.");
+        }
+      } 
+      finally { 
+        setLoading(false); 
+      }
     };
     if (user) fetchStats();
   }, [user]);
@@ -93,15 +100,30 @@ const StudentDashboard = () => {
         </header>
 
         <main className="flex-1 overflow-y-auto p-6 md:p-10">
-           {loading ? <p className="text-center mt-20 font-bold">Loading Data...</p> : (
+           {loading ? (
+             <div className="flex flex-col items-center justify-center mt-20">
+               <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600 mb-4"></div>
+               <p className="text-slate-500 font-bold">Loading your dashboard...</p>
+             </div>
+           ) : error ? (
+             // FIX: Display Error UI instead of crashing
+             <div className="max-w-2xl mx-auto mt-20 bg-red-50 border border-red-200 text-red-700 p-6 rounded-xl shadow-sm text-center">
+                <FaExclamationTriangle className="text-4xl mx-auto mb-4 text-red-500" />
+                <h3 className="text-xl font-bold mb-2">Oops! Something went wrong.</h3>
+                <p className="mb-6">{error}</p>
+                <button onClick={logout} className="bg-red-600 text-white px-6 py-2 rounded-lg font-bold hover:bg-red-700 transition">
+                  Log Out & Re-authenticate
+                </button>
+             </div>
+           ) : (
              <>
                {/* --------------------------- MAIN DASHBOARD --------------------------- */}
                {view === 'dashboard' && (
                  <div className="max-w-6xl mx-auto space-y-6">
-                    <h2 className="text-3xl font-bold mb-6">Welcome, {user?.name?.split(' ')[0]}! 👋</h2>
+                    <h2 className="text-3xl font-bold mb-6">Welcome, {user?.name?.split(' ')[0] || 'Student'}! 👋</h2>
 
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                       {/* THE NEW TIMETABLE WIDGET */}
+                       {/* THE TIMETABLE WIDGET */}
                        <div className="lg:col-span-2 bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
                           <div className="bg-slate-50 border-b flex overflow-x-auto hide-scrollbar">
                              {DAYS.map(day => (
@@ -132,7 +154,8 @@ const StudentDashboard = () => {
                                       <p>Classes created by teachers outside of normal schedule or duplicated today appear here.</p>
                                    </div>
                                    <div className="space-y-4">
-                                      {dashboardData.makeupClassesToday?.length > 0 ? (
+                                      {/* FIX: Safe navigation with dashboardData?. */}
+                                      {dashboardData?.makeupClassesToday?.length > 0 ? (
                                          dashboardData.makeupClassesToday.map((act, i) => (
                                             <div key={i} className="flex justify-between p-4 bg-white border border-gray-200 rounded-lg shadow-sm">
                                                <div>
@@ -164,7 +187,8 @@ const StudentDashboard = () => {
                           <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
                              <h3 className="font-bold text-sm text-slate-400 uppercase tracking-wide border-b pb-2 mb-4">Today's Activity</h3>
                              <div className="space-y-3">
-                                {dashboardData.recentActivity?.length > 0 ? (
+                                {/* FIX: Safe navigation with dashboardData?. */}
+                                {dashboardData?.recentActivity?.length > 0 ? (
                                    dashboardData.recentActivity.map((act, i) => (
                                       <div key={i} className="flex items-center justify-between">
                                          <div>
@@ -188,19 +212,39 @@ const StudentDashboard = () => {
                     <button onClick={() => setView('dashboard')} className="flex items-center text-blue-600 font-bold hover:underline mb-4"><FaChevronRight className="rotate-180 mr-1"/> Back to Dashboard</button>
                     <h2 className="text-2xl font-bold">Overall Attendance Analytics</h2>
                     
-                    {/* STAT CARDS MOVED HERE */}
+                    {/* STAT CARDS - FIX: Pass full class strings instead of partial dynamic names */}
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                       <StatCard label="Overall" value={`${Math.round(dashboardData.overallPercentage)}%`} color="green" />
-                       <StatCard label="Classes This Week" value={dashboardData.classesThisWeek} color="blue" />
-                       <StatCard label="Subjects at Risk" value={dashboardData.subjectsAtRisk} color="red" />
-                       <StatCard label="Current Streak" value="5 Days" color="orange" />
+                       <StatCard 
+                          label="Overall" 
+                          value={`${Math.round(dashboardData?.overallPercentage || 0)}%`} 
+                          borderColor="border-green-500" 
+                          textColor="text-green-600" 
+                       />
+                       <StatCard 
+                          label="Classes This Week" 
+                          value={dashboardData?.classesThisWeek || 0} 
+                          borderColor="border-blue-500" 
+                          textColor="text-blue-600" 
+                       />
+                       <StatCard 
+                          label="Subjects at Risk" 
+                          value={dashboardData?.subjectsAtRisk || 0} 
+                          borderColor="border-red-500" 
+                          textColor="text-red-600" 
+                       />
+                       <StatCard 
+                          label="Current Streak" 
+                          value="5 Days" 
+                          borderColor="border-orange-500" 
+                          textColor="text-orange-600" 
+                       />
                     </div>
 
-                    {/* SUBJECT TABLE MOVED HERE */}
                     <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
                        <div className="p-6 border-b bg-slate-50"><h3 className="font-bold">Subject Details</h3></div>
                        <div className="divide-y">
-                          {dashboardData.subjectAttendance?.map((sub, idx) => (
+                          {/* FIX: Safe mapping with fallback array */}
+                          {(dashboardData?.subjectAttendance || []).map((sub, idx) => (
                              <div key={idx} className="flex items-center justify-between p-6 hover:bg-gray-50">
                                 <div>
                                    <h4 className="font-bold text-lg">{sub.subjectName}</h4>
@@ -223,29 +267,28 @@ const StudentDashboard = () => {
                {view === 'scanner' && <StudentScanner />}
 
                {/* PROFILE VIEW */}
-               {!loading && view === 'profile' && (
+               {view === 'profile' && (
                   <div className="max-w-6xl mx-auto">
                      <StudentProfile onBack={() => setView('dashboard')} />
                   </div>
                )}
 
                {/* ASSESSMENT VIEW */}
-               {!loading && view === 'assessment' && (
+               {view === 'assessment' && (
                   <div className="max-w-6xl mx-auto w-full">
                      <StudentAssessment onBack={() => setView('dashboard')} />
                   </div>
                )}
 
-
                {/* AI ADVISOR VIEW */}
-               {!loading && view === 'ai-advisor' && (
+               {view === 'ai-advisor' && (
                   <div className="max-w-6xl mx-auto">
-                     <AILearningPath onBack={() => setView('dashboard')} 
-                     onNavigateToAssessment={() => setView('assessment')} />
+                     <AILearningPath 
+                        onBack={() => setView('dashboard')} 
+                        onNavigateToAssessment={() => setView('assessment')} 
+                     />
                   </div>
                )}
-
-
              </>
            )}
         </main>
@@ -254,11 +297,10 @@ const StudentDashboard = () => {
   );
 };
 
-// Simple Stat Card
-const StatCard = ({ label, value, color }) => (
-  <div className={`p-6 rounded-xl border-l-4 border-${color}-500 bg-white shadow-sm`}>
+const StatCard = ({ label, value, borderColor, textColor }) => (
+  <div className={`p-6 rounded-xl border-l-4 ${borderColor} bg-white shadow-sm`}>
      <p className="text-xs font-bold text-slate-400 uppercase mb-1">{label}</p>
-     <h3 className={`text-3xl font-black text-${color}-600`}>{value}</h3>
+     <h3 className={`text-3xl font-black ${textColor}`}>{value}</h3>
   </div>
 );
 
