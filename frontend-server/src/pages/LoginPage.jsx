@@ -30,6 +30,7 @@ const LoginPage = () => {
     const response = await fetch(`${BASE_API_URL}/api/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: "include",
         body: JSON.stringify({ userId, password }),
       });
 

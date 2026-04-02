@@ -37,19 +37,21 @@ const StudentDashboard = () => {
 
   useEffect(() => {
     const fetchStats = async () => {
+
        if (!user?.userId) return; 
+
      try {
       setError(null);
-      const token = localStorage.getItem('token');
+
       const url = `${BASE_API_URL}/api/student/stats/${user.userId}`;
 
       const res = await axios.get(url, {
-          headers: { Authorization: `Bearer ${token}` }
+          withCredentials: true
       });
         setDashboardData(res.data);
       } catch (err) { 
         console.error("Failed to load stats", err); 
-        if (err.response?.status === 403) {
+        if (err.response?.status === 403 || err.response?.status === 401) {
             setError("Your session has expired. Please log out and log back in.");
         } else {
             setError("Failed to load dashboard data. Please try again later.");

@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useEffect } from "react";
+import axios from "axios";
 
 
 const AuthContext = createContext();
@@ -11,9 +12,7 @@ export const AuthProvider = ({ children }) => {
 
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    setLoading(false);
-  }, []);
+  useEffect(() => { setLoading(false); }, []);
 
   const login = (userData) => {
     setUser(userData);
@@ -21,7 +20,14 @@ export const AuthProvider = ({ children }) => {
   };
 
 
-  const logout = () => {
+  const logout = async() => {
+    try {
+      await axios.post(`${import.meta.env.VITE_SPRING_BACKEND_URL}/api/auth/logout`, {}, {
+        withCredentials: true 
+      });
+    } catch (err) {
+      console.error("Failed to log out from server", err);
+    }
     setUser(null);
     localStorage.removeItem('sals_user');
     window.location.href = "/";

@@ -1,14 +1,13 @@
 import axios from 'axios';
 
-// const API_URL = 'https://7fdblmk4-8080.inc1.devtunnels.ms/api/attendance'; 
-
-const BASE_API_URL = `${import.meta.env.VITE_SPRING_BACKEND_URL}`;
-
+axios.defaults.withCredentials = true;
 
 /**
  * 1. Start a New Class Session
  * payload: { subject: "Data Structures", batch: "2024-A" }
  */
+
+const BASE_API_URL = `${import.meta.env.VITE_SPRING_BACKEND_URL}`;
 
 export const startSession = async (subject, batch) => {
   try {
@@ -27,9 +26,8 @@ export const startSession = async (subject, batch) => {
 // ----- 2. Generate QR Token for a Session {payload: { sessionId: "DATASTRUCTURES-177..." } ----- //
 export const getQrToken = async (sessionId) => {
   try {
-    const token = localStorage.getItem("token");
     const response = await axios.get(`${BASE_API_URL}/api/attendance/generate-qr`, {
-        params: { sessionId }, headers: { Authorization: token ? `Bearer ${token}` : "" }
+        params: { sessionId }
     });
     return response.data; 
   } catch (error) {
@@ -41,22 +39,13 @@ export const getQrToken = async (sessionId) => {
 
 // ----- 3. Mark Attendance with SELFIE {payload: { qrToken, studentId, lat, lng, file } } ----- 
 export const markAttendance = async (formData) => {
-
-  const token = localStorage.getItem("token");
-
-    if (!token) {
-        return { status: "ERROR", message: "You are not logged in!" };
-    }
-
   try {
-    const response = await axios.post(`${BASE_API_URL}/api/attendance/mark`, formData, {
-      headers: { Authorization: `Bearer ${token}` }
-    });
+    const response = await axios.post(`${BASE_API_URL}/api/attendance/mark`, formData);
     return response.data; 
   } catch (error) {
     console.error("Error marking attendance:", error);
     if (error.response) {
-      if (error.response.status === 403) {
+      if (error.response.status === 403 || error.response.status === 401) {
             return { status: "ERROR", message: "Session Expired. Please Login Again." };
         }
         return { status: "ERROR", message: error.response.data.message || "Server Error" };
@@ -69,10 +58,7 @@ export const markAttendance = async (formData) => {
 // ----- 4. View Attendance Real Time Logs on teacher dashboard {payload: { sessionId: "DATASTRUCTURES-177..." }} -----
 export const getLiveSessionLogs = async (sessionId) => {
   try {
-    const token = localStorage.getItem('token');
-    const response = await axios.get(`${BASE_API_URL}/api/teacher/session-logs/${sessionId}`, {
-      headers: { Authorization: `Bearer ${token}` }
-    });
+    const response = await axios.get(`${BASE_API_URL}/api/teacher/session-logs/${sessionId}`);
     return response.data;
   } catch (error) {
     console.error("Failed to fetch live logs", error);
@@ -84,10 +70,7 @@ export const getLiveSessionLogs = async (sessionId) => {
 // ----- 5. Fetch all sessions for a teacher (for session history page) {payload: { teacherId: "TEACHER-123..." }} -----
 export const getTeacherSessions = async (teacherId) => {
   try {
-    const token = localStorage.getItem('token');
-    const response = await axios.get(`${BASE_API_URL}/api/teacher/sessions/${teacherId}`, {
-      headers: { Authorization: `Bearer ${token}` }
-    });
+    const response = await axios.get(`${BASE_API_URL}/api/teacher/sessions/${teacherId}`);
     return response.data;
   } catch (error) {
     console.error("Failed to fetch sessions", error);
@@ -99,10 +82,7 @@ export const getTeacherSessions = async (teacherId) => {
 // ----- 6. Fetch analytics data for teacher dashboard analytics page {payload: { teacherId: "TEACHER-123..." }} -----
 export const getTeacherAnalytics = async (teacherId) => {
   try {
-    const token = localStorage.getItem('token');
-    const response = await axios.get(`${BASE_API_URL}/api/teacher/analytics/${teacherId}`, {
-      headers: { Authorization: `Bearer ${token}` }
-    });
+    const response = await axios.get(`${BASE_API_URL}/api/teacher/analytics/${teacherId}`);
     return response.data;
   } catch (error) {
     console.error("Failed to fetch analytics", error);
@@ -114,10 +94,7 @@ export const getTeacherAnalytics = async (teacherId) => {
 // ----- 7. Fetch students for a teacher (for analytics page) {payload: { teacherId: "TEACHER-123..." }} -----
 export const getTeacherStudents = async (teacherId) => {
   try {
-    const token = localStorage.getItem('token');
-    const response = await axios.get(`${BASE_API_URL}/api/teacher/students/${teacherId}`, {
-      headers: { Authorization: `Bearer ${token}` }
-    });
+    const response = await axios.get(`${BASE_API_URL}/api/teacher/students/${teacherId}`);
     return response.data;
   } catch (error) {
     console.error("Failed to fetch students", error);
@@ -129,10 +106,7 @@ export const getTeacherStudents = async (teacherId) => {
 // ----- 8. Fetch individual student profile (for manage students page) {payload: { studentId: "12345678" }} -----
 export const getStudentProfile = async (studentId) => {
   try {
-    const token = localStorage.getItem('token');
-       const response = await axios.get(`${BASE_API_URL}/api/student/profile/${studentId}`, {
-      headers: { Authorization: `Bearer ${token}` }
-    });
+       const response = await axios.get(`${BASE_API_URL}/api/student/profile/${studentId}`);
     return response.data;
   } catch (error) {
     console.error("Failed to fetch profile", error);
@@ -144,11 +118,7 @@ export const getStudentProfile = async (studentId) => {
 // ----- 9. Download attendance report as CSV (for session history page) {payload: { sessionId: "DATASTRUCTURES-177..." }} -----
 export const downloadAttendanceCSV = async (sessionId) => {
   try {
-    const token = localStorage.getItem('token');
-    const response = await axios.get(`${BASE_API_URL}/api/teacher/sessions/${sessionId}/export`, {
-      headers: { Authorization: `Bearer ${token}` },
-      responseType: 'blob' 
-    });
+    const response = await axios.get(`${BASE_API_URL}/api/teacher/sessions/${sessionId}/export`, { responseType: 'blob' });
 
     const url = window.URL.createObjectURL(new Blob([response.data]));
     const link = document.createElement('a');
@@ -168,10 +138,7 @@ export const downloadAttendanceCSV = async (sessionId) => {
 // ----- 10. AI QUIZ ASSESSMENT SERVICE + AI LEARNING PATH SERVICES {payload: { studentId: "12345678", subjectId: "1, 2, 3 ...." }} -----
 export const generateAIQuiz = async (studentId, subjectId) => {
   try {
-    const token = localStorage.getItem('token');
-    const response = await axios.get(`${BASE_API_URL}/api/ai/quiz/generate/${studentId}/${subjectId}`, {
-      headers: { Authorization: `Bearer ${token}` }
-    });
+    const response = await axios.get(`${BASE_API_URL}/api/ai/quiz/generate/${studentId}/${subjectId}`);
     return response.data;
   } catch (error) {
     console.error("Failed to fetch AI quiz", error);
@@ -183,10 +150,8 @@ export const generateAIQuiz = async (studentId, subjectId) => {
 // ----- 11. Submit AI Quiz Score {payload: { studentId: "12345678", subjectId: "1, 2, 3 ....", score: 17 }} -----
 export const submitQuizScore = async (studentId, subjectId, score) => {
   try {
-    const token = localStorage.getItem('token');
     const response = await axios.post(`${BASE_API_URL}/api/ai/quiz/submit`, 
       { studentId, subjectId, score },
-      { headers: { Authorization: `Bearer ${token}` } }
     );
     return response.data;
   } catch (error) {
@@ -199,10 +164,7 @@ export const submitQuizScore = async (studentId, subjectId, score) => {
 // ----- 12. Get Comprehensive AI Learning Path (with personalized resources) {payload: { studentId: "12345678", subjectId: "1, 2, 3 ...." }} -----
 export const getComprehensiveAILearningPath = async (studentId, subjectId) => {
   try {
-    const token = localStorage.getItem('token');
-    const response = await axios.get(`${BASE_API_URL}/api/ai/path/comprehensive/${studentId}/${subjectId}`, {
-      headers: { Authorization: `Bearer ${token}` }
-    });
+    const response = await axios.get(`${BASE_API_URL}/api/ai/path/comprehensive/${studentId}/${subjectId}`);
     return response.data;
   } catch (error) {
     console.error("Failed to generate AI roadmap", error);
@@ -214,10 +176,7 @@ export const getComprehensiveAILearningPath = async (studentId, subjectId) => {
 // ----- 13. Get AI Learning Path (for personalized learning) {payload: { studentId: "12345678", subject: "JAVA PROGRAMMING" }} -----
 export const getAILearningPath = async (studentId, subject) => {
   try {
-    const token = localStorage.getItem('token');
-    const response = await axios.get(`${BASE_API_URL}/api/ai/path/${studentId}/${subject}`, {
-      headers: { Authorization: `Bearer ${token}` }
-    });
+    const response = await axios.get(`${BASE_API_URL}/api/ai/path/${studentId}/${subject}`);
     return response.data;
   } catch (error) {
     console.error("Failed to fetch AI path", error);
@@ -230,31 +189,31 @@ export const getAILearningPath = async (studentId, subject) => {
 
 
 
-// ============================================================
-    // (INTERCEPTORS) - DEBUGGING TOOL FOR ALL REQUESTS/RESPONSES
-// ============================================================
+// // ============================================================
+//     // (INTERCEPTORS) - DEBUGGING TOOL FOR ALL REQUESTS/RESPONSES
+// // ============================================================
 
-// axios.interceptors.request.use(request => {
-//   console.log('🚀 [CLIENT SENDING]:', request.method.toUpperCase(), request.url, request.data);
-//   return request;
-// }, error => {
-//   console.error('❌ [CLIENT ERROR]:', error);
-//   return Promise.reject(error);
-// });
+// // axios.interceptors.request.use(request => {
+// //   console.log('🚀 [CLIENT SENDING]:', request.method.toUpperCase(), request.url, request.data);
+// //   return request;
+// // }, error => {
+// //   console.error('❌ [CLIENT ERROR]:', error);
+// //   return Promise.reject(error);
+// // });
 
-// // Response Detector: Prints what we are receiving
-// axios.interceptors.response.use(response => {
-//   // console.log('✅ [CLIENT RECEIVED]:', response.status, response.data);
-//    console.log('✅ [CLIENT RECEIVED]:', response.status, response.data);
-//   return response;
-// }, error => {
-//   if (error.response) {
-//       console.error('⚠️ [CLIENT FAILED]:', error.response.status, error.response.data);
-//   } else {
-//       console.error('⚠️ [NETWORK ERROR]: Check your IP/Wifi Connection');
-//   }
-//   return Promise.reject(error);
-// });
+// // // Response Detector: Prints what we are receiving
+// // axios.interceptors.response.use(response => {
+// //   // console.log('✅ [CLIENT RECEIVED]:', response.status, response.data);
+// //    console.log('✅ [CLIENT RECEIVED]:', response.status, response.data);
+// //   return response;
+// // }, error => {
+// //   if (error.response) {
+// //       console.error('⚠️ [CLIENT FAILED]:', error.response.status, error.response.data);
+// //   } else {
+// //       console.error('⚠️ [NETWORK ERROR]: Check your IP/Wifi Connection');
+// //   }
+// //   return Promise.reject(error);
+// // });
 
 
 
