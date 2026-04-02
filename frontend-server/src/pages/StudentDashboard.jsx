@@ -20,6 +20,8 @@ const TIMETABLE = {
 };
 const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Makeup'];
 
+const BASE_API_URL = `${import.meta.env.VITE_SPRING_BACKEND_URL}`;
+
 const StudentDashboard = () => {
   const { user, logout } = useAuth();
   const [view, setView] = useState('dashboard');
@@ -37,12 +39,15 @@ const StudentDashboard = () => {
 
   useEffect(() => {
     const fetchStats = async () => {
-      try {
-        const token = localStorage.getItem('token');
-      //   const res = await axios.get(`http://localhost:8080/api/student/stats/${user.userId}`, {
-      const res = await axios.get(`https://7fdblmk4-8080.inc1.devtunnels.ms/api/student/stats/${user.userId}`, {
-            headers: { Authorization: `Bearer ${token}` }
-        });
+       if (!user?.userId) return; 
+     try {
+      const token = localStorage.getItem('token');
+      const url = `${BASE_API_URL}/api/student/stats/${user.userId}`;
+      // console.log("Fetching from:", url); // Use this for URL debugging.
+
+      const res = await axios.get(url, {
+          headers: { Authorization: `Bearer ${token}` }
+      });
         setDashboardData(res.data);
       } catch (err) { console.error("Failed to load stats", err); } 
       finally { setLoading(false); }

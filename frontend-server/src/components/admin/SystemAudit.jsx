@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { FaShieldAlt, FaExclamationTriangle, FaCheckCircle, FaPaperPlane } from 'react-icons/fa';
 
+const BASE_API_URL = `${import.meta.env.VITE_SPRING_BACKEND_URL}`;
+
 const SystemAudit = () => {
   const [isAuditing, setIsAuditing] = useState(false);
   const [auditResult, setAuditResult] = useState(null);
@@ -10,11 +12,12 @@ const SystemAudit = () => {
     setAuditResult(null);
 
     try {
-    //   const response = await fetch('http://localhost:8080/api/admin/trigger-audit', {
-    const response = await fetch('https://7fdblmk4-8080.inc1.devtunnels.ms/api/admin/trigger-audit', {
+    const response = await fetch(`${BASE_API_URL}/api/admin/trigger-audit`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' }
       });
+
+      if(!response.ok) { throw new Error(`Server Error: ${response.status}`); }
       
       const data = await response.json();
       

@@ -1,7 +1,8 @@
 import axios from 'axios';
 
-// const API_URL = 'http://localhost:8080/api/attendance';     //localhost
-const API_URL = 'https://7fdblmk4-8080.inc1.devtunnels.ms/api/attendance'; 
+// const API_URL = 'https://7fdblmk4-8080.inc1.devtunnels.ms/api/attendance'; 
+
+const BASE_API_URL = `${import.meta.env.VITE_SPRING_BACKEND_URL}`;
 
 
 /**
@@ -11,7 +12,7 @@ const API_URL = 'https://7fdblmk4-8080.inc1.devtunnels.ms/api/attendance';
 
 export const startSession = async (subject, batch) => {
   try {
-    const response = await axios.post(`${API_URL}/create-session`, {
+    const response = await axios.post(`${BASE_API_URL}/api/attendance/create-session`, {
       subject: subject,
       batch: batch
     });
@@ -27,7 +28,7 @@ export const startSession = async (subject, batch) => {
 export const getQrToken = async (sessionId) => {
   try {
     const token = localStorage.getItem("token");
-    const response = await axios.get(`${API_URL}/generate-qr`, {
+    const response = await axios.get(`${BASE_API_URL}/api/attendance/generate-qr`, {
         params: { sessionId }, headers: { Authorization: token ? `Bearer ${token}` : "" }
     });
     return response.data; 
@@ -48,7 +49,7 @@ export const markAttendance = async (formData) => {
     }
 
   try {
-    const response = await axios.post(`${API_URL}/mark`, formData, {
+    const response = await axios.post(`${BASE_API_URL}/api/attendance/mark`, formData, {
       headers: { Authorization: `Bearer ${token}` }
     });
     return response.data; 
@@ -69,8 +70,7 @@ export const markAttendance = async (formData) => {
 export const getLiveSessionLogs = async (sessionId) => {
   try {
     const token = localStorage.getItem('token');
-    // const response = await axios.get(`http://localhost:8080/api/teacher/session-logs/${sessionId}`, {
-    const response = await axios.get(`https://7fdblmk4-8080.inc1.devtunnels.ms/api/teacher/session-logs/${sessionId}`, {
+    const response = await axios.get(`${BASE_API_URL}/api/teacher/session-logs/${sessionId}`, {
       headers: { Authorization: `Bearer ${token}` }
     });
     return response.data;
@@ -85,8 +85,7 @@ export const getLiveSessionLogs = async (sessionId) => {
 export const getTeacherSessions = async (teacherId) => {
   try {
     const token = localStorage.getItem('token');
-    // const response = await axios.get(`http://localhost:8080/api/teacher/sessions/${teacherId}`, {
-    const response = await axios.get(`https://7fdblmk4-8080.inc1.devtunnels.ms/api/teacher/sessions/${teacherId}`, {
+    const response = await axios.get(`${BASE_API_URL}/api/teacher/sessions/${teacherId}`, {
       headers: { Authorization: `Bearer ${token}` }
     });
     return response.data;
@@ -101,8 +100,7 @@ export const getTeacherSessions = async (teacherId) => {
 export const getTeacherAnalytics = async (teacherId) => {
   try {
     const token = localStorage.getItem('token');
-    // const response = await axios.get(`http://localhost:8080/api/teacher/analytics/${teacherId}`, {
-    const response = await axios.get(`https://7fdblmk4-8080.inc1.devtunnels.ms/api/teacher/analytics/${teacherId}`, {
+    const response = await axios.get(`${BASE_API_URL}/api/teacher/analytics/${teacherId}`, {
       headers: { Authorization: `Bearer ${token}` }
     });
     return response.data;
@@ -117,8 +115,7 @@ export const getTeacherAnalytics = async (teacherId) => {
 export const getTeacherStudents = async (teacherId) => {
   try {
     const token = localStorage.getItem('token');
-    // const response = await axios.get(`http://localhost:8080/api/teacher/students/${teacherId}`, {
-    const response = await axios.get(`https://7fdblmk4-8080.inc1.devtunnels.ms/api/teacher/students/${teacherId}`, {
+    const response = await axios.get(`${BASE_API_URL}/api/teacher/students/${teacherId}`, {
       headers: { Authorization: `Bearer ${token}` }
     });
     return response.data;
@@ -133,8 +130,7 @@ export const getTeacherStudents = async (teacherId) => {
 export const getStudentProfile = async (studentId) => {
   try {
     const token = localStorage.getItem('token');
-    // const response = await axios.get(`http://localhost:8080/api/student/profile/${studentId}`, {
-       const response = await axios.get(`https://7fdblmk4-8080.inc1.devtunnels.ms/api/student/profile/${studentId}`, {
+       const response = await axios.get(`${BASE_API_URL}/api/student/profile/${studentId}`, {
       headers: { Authorization: `Bearer ${token}` }
     });
     return response.data;
@@ -149,8 +145,7 @@ export const getStudentProfile = async (studentId) => {
 export const downloadAttendanceCSV = async (sessionId) => {
   try {
     const token = localStorage.getItem('token');
-    // const response = await axios.get(`http://localhost:8080/api/teacher/sessions/${sessionId}/export`, {
-    const response = await axios.get(`https://7fdblmk4-8080.inc1.devtunnels.ms/api/teacher/sessions/${sessionId}/export`, {
+    const response = await axios.get(`${BASE_API_URL}/api/teacher/sessions/${sessionId}/export`, {
       headers: { Authorization: `Bearer ${token}` },
       responseType: 'blob' 
     });
@@ -174,7 +169,7 @@ export const downloadAttendanceCSV = async (sessionId) => {
 export const generateAIQuiz = async (studentId, subjectId) => {
   try {
     const token = localStorage.getItem('token');
-    const response = await axios.get(`https://7fdblmk4-8080.inc1.devtunnels.ms/api/ai/quiz/generate/${studentId}/${subjectId}`, {
+    const response = await axios.get(`${BASE_API_URL}/api/ai/quiz/generate/${studentId}/${subjectId}`, {
       headers: { Authorization: `Bearer ${token}` }
     });
     return response.data;
@@ -189,7 +184,7 @@ export const generateAIQuiz = async (studentId, subjectId) => {
 export const submitQuizScore = async (studentId, subjectId, score) => {
   try {
     const token = localStorage.getItem('token');
-    const response = await axios.post(`https://7fdblmk4-8080.inc1.devtunnels.ms/api/ai/quiz/submit`, 
+    const response = await axios.post(`${BASE_API_URL}/api/ai/quiz/submit`, 
       { studentId, subjectId, score },
       { headers: { Authorization: `Bearer ${token}` } }
     );
@@ -205,7 +200,7 @@ export const submitQuizScore = async (studentId, subjectId, score) => {
 export const getComprehensiveAILearningPath = async (studentId, subjectId) => {
   try {
     const token = localStorage.getItem('token');
-    const response = await axios.get(`https://7fdblmk4-8080.inc1.devtunnels.ms/api/ai/path/comprehensive/${studentId}/${subjectId}`, {
+    const response = await axios.get(`${BASE_API_URL}/api/ai/path/comprehensive/${studentId}/${subjectId}`, {
       headers: { Authorization: `Bearer ${token}` }
     });
     return response.data;
@@ -220,8 +215,7 @@ export const getComprehensiveAILearningPath = async (studentId, subjectId) => {
 export const getAILearningPath = async (studentId, subject) => {
   try {
     const token = localStorage.getItem('token');
-    // const response = await axios.get(`http://localhost:8080/api/ai/path/${studentId}/${subject}`, {
-    const response = await axios.get(`https://7fdblmk4-8080.inc1.devtunnels.ms/api/ai/path/${studentId}/${subject}`, {
+    const response = await axios.get(`${BASE_API_URL}/api/ai/path/${studentId}/${subject}`, {
       headers: { Authorization: `Bearer ${token}` }
     });
     return response.data;

@@ -3,6 +3,8 @@ import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { FaUserShield, FaSpinner } from "react-icons/fa";
 
+const BASE_API_URL = `${import.meta.env.VITE_SPRING_BACKEND_URL}`;
+
 const LoginPage = () => {
 
   //   // 1. ADD THIS TEMPORARY EFFECT
@@ -25,8 +27,7 @@ const LoginPage = () => {
     setIsLoading(true);
 
     try {
-    //  const response = await fetch("http://localhost:8080/api/auth/login", {
-    const response = await fetch("https://7fdblmk4-8080.inc1.devtunnels.ms/api/auth/login", {
+    const response = await fetch(`${BASE_API_URL}/api/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ userId, password }),

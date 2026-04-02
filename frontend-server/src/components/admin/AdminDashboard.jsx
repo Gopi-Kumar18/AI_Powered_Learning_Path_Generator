@@ -13,8 +13,6 @@ const AdminDashboard = () => {
   const [stats, setStats] = useState({ totalStudents: 0, totalTeachers: 0, totalSessions: 0 });
   const [formData, setFormData] = useState({ customId: '', name: '', email: '', password: '', role: 'STUDENT' });
   const [message, setMessage] = useState(null);
-
-  // --- New State for Syllabus Upload ---
   const [selectedFile, setSelectedFile] = useState(null);
   const [uploadSubjectId, setUploadSubjectId] = useState('');
   const [uploadMessage, setUploadMessage] = useState(null);
@@ -45,7 +43,7 @@ const subjects = [
     setMessage(result);
     if (result.status === 'SUCCESS') {
       setFormData({ customId: '', name: '', email: '', password: '', role: 'STUDENT' }); // Reset form
-      const updatedStats = await getSystemStats(); // Refresh stats
+      const updatedStats = await getSystemStats(); 
       if (updatedStats) setStats(updatedStats);
     }
     setTimeout(() => setMessage(null), 4000);
@@ -60,14 +58,12 @@ const subjects = [
     }
 
     setIsUploading(true);
-    // Call the service we just created
     const result = await uploadSubjectSyllabus(uploadSubjectId, selectedFile);
     setUploadMessage(result);
     setIsUploading(false);
 
     if (result.status === 'SUCCESS') {
       setSelectedFile(null);
-      // Reset the file input visually
       document.getElementById('syllabus-upload').value = ''; 
     }
     

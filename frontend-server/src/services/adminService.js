@@ -1,13 +1,13 @@
 import axios from 'axios';
 
-// const API_URL = 'http://localhost:8080/api/admin';
+const BASE_API_URL = `${import.meta.env.VITE_SPRING_BACKEND_URL}`;
 
-const API_URL = 'https://7fdblmk4-8080.inc1.devtunnels.ms/api/admin';
+
 
 export const getSystemStats = async () => {
   try {
     const token = localStorage.getItem('token');
-    const response = await axios.get(`${API_URL}/stats`, {
+    const response = await axios.get(`${BASE_API_URL}/api/admin/stats`, {
       headers: { Authorization: `Bearer ${token}` }
     });
     return response.data;
@@ -20,7 +20,7 @@ export const getSystemStats = async () => {
 export const registerUser = async (userData) => {
   try {
     const token = localStorage.getItem('token');
-    const response = await axios.post(`${API_URL}/register`, userData, {
+    const response = await axios.post(`${BASE_API_URL}/api/admin/register`, userData, {
       headers: { Authorization: `Bearer ${token}` }
     });
     return response.data;
@@ -39,11 +39,10 @@ export const uploadSubjectSyllabus = async (subjectId, file) => {
 
   try {
     const token = localStorage.getItem('token');
-    // Adjust the URL if your controller mapping is different
-    const response = await axios.post(`${API_URL}/subject/${subjectId}/upload-syllabus`, formData, {
+    const response = await axios.post(`${BASE_API_URL}/api/admin/subject/${subjectId}/upload-syllabus`, formData, {
       headers: { 
         Authorization: `Bearer ${token}`,
-        'Content-Type': 'multipart/form-data' // CRITICAL for file uploads
+        'Content-Type': 'multipart/form-data' 
       }
     });
     return response.data;

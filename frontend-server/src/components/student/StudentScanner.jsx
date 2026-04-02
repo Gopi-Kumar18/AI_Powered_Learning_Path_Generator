@@ -1,5 +1,4 @@
 
-//improved UI - 2
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { Scanner } from '@yudiel/react-qr-scanner';
 import Webcam from 'react-webcam'; 
@@ -27,14 +26,13 @@ const StudentScanner = () => {
         setLocation({ lat: pos.coords.latitude, lng: pos.coords.longitude, accuracy: pos.coords.accuracy });
       },
       (err) => { 
-        // Keep checking or show error
         console.log("GPS Error", err);
       },
       { enableHighAccuracy: true }
     );
   }, []);
 
-  // --- STEPPER HELPERS ---
+  // --- HELPERS ---
   const getStepStatus = (stepIndex) => {
     // 1: Scan, 2: Selfie, 3: Verify
     if (status === 'idle' && stepIndex === 1) return 'active';
