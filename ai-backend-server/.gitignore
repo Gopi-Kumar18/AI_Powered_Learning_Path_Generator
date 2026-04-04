@@ -2,3 +2,13 @@ venv/
 __pycache__/
 *.pyc
 .env
+
+# Ignore test files
+test_*.py
+face_detection_cnt.py
+
+# Ignore wheel/binary files
+*.whl
+
+
+
