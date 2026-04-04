@@ -20,7 +20,8 @@ import java.util.Map;
 public class FaceVerificationService {
 
     // The URL of your AI-backend-server
-    private final String AI_SERVER_URL = "http://localhost:8000/verify-face";
+//    private final String AI_SERVER_URL = "http://localhost:8000/verify-face";
+    private final String AI_SERVER_URL = "https://ai-smartpathmaker.up.railway.app";
     private final RestTemplate restTemplate = new RestTemplate();
 
     // ----- 1. Face Validation Service method for veryfying a student's face(FastAPI Backend) -----
