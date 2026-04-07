@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Helmet } from 'react-helmet-async';
 import { FaCalendarAlt, FaUsers, FaArrowLeft, FaEye, FaCheckCircle, FaDownload } from 'react-icons/fa';
 import { getTeacherSessions, getLiveSessionLogs, downloadAttendanceCSV } from '../../services/qrAttendanceService';
 

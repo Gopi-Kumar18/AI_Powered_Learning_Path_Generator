@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Helmet } from 'react-helmet-async';
 import { FaUser, FaEnvelope, FaIdCard, FaFingerprint, FaShieldAlt, FaKey, FaArrowLeft } from 'react-icons/fa';
 import { getStudentProfile } from '../../services/qrAttendanceService';
 import { useAuth } from '../../context/AuthContext';

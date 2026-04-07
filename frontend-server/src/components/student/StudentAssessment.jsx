@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Helmet } from 'react-helmet-async';
 import { FaBrain, FaArrowLeft, FaCheckCircle, FaTimesCircle, FaPlay } from 'react-icons/fa';
 import { generateAIQuiz, submitQuizScore, getComprehensiveAILearningPath } from '../../services/qrAttendanceService';
 import { useAuth } from '../../context/AuthContext';

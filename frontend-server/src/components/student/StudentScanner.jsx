@@ -1,5 +1,6 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
+import { Helmet } from 'react-helmet-async';
 import { Scanner } from '@yudiel/react-qr-scanner';
 import Webcam from 'react-webcam'; 
 import { FaMapMarkerAlt, FaCheckCircle, FaTimesCircle, FaCamera, FaSpinner, FaQrcode, FaShieldAlt, FaInfoCircle } from 'react-icons/fa';

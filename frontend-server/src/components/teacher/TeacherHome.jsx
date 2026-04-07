@@ -1,5 +1,7 @@
 import { FaQrcode, FaChartPie, FaUserGraduate, FaCalendarCheck } from 'react-icons/fa';
+import { Helmet } from 'react-helmet-async';
 import { useAuth } from '../../context/AuthContext';
+
 
 const TeacherHome = ({ onViewChange }) => {
   const { user } = useAuth();

@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Helmet } from 'react-helmet-async';
 import { FaChartLine, FaArrowLeft, FaChalkboardTeacher, FaUsers } from 'react-icons/fa';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, LineChart, Line, CartesianGrid } from 'recharts';
 import { getTeacherAnalytics } from '../../services/qrAttendanceService';

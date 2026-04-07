@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Helmet } from 'react-helmet-async';
 import axios from 'axios';
 import { FaThLarge, FaQrcode, FaHistory, FaUser, FaSignOutAlt, FaBars, FaChevronRight, FaCheckCircle, FaTimesCircle, FaCalendarAlt, FaExclamationTriangle, FaClock, FaRobot, FaBrain } from 'react-icons/fa';
 import StudentScanner from '../components/student/StudentScanner';
@@ -6,6 +7,7 @@ import { useAuth } from '../context/AuthContext';
 import StudentProfile from '../components/student/StudentProfile';
 import AILearningPath from '../components/student/AILearningPath';
 import StudentAssessment from '../components/student/StudentAssessment';
+
 
 // Timetable UI Data
 const TIMETABLE = {

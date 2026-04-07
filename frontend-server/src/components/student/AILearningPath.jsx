@@ -1,4 +1,5 @@
 import { useState, useRef } from 'react';
+import { Helmet } from 'react-helmet-async';
 import ReactMarkdown from 'react-markdown';
 import { FaRobot, FaMagic, FaBookOpen, FaArrowLeft, FaBrain, FaFilePdf } from 'react-icons/fa';
 import { getAILearningPath } from '../../services/qrAttendanceService';

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { FaChalkboardTeacher, FaQrcode, FaHistory, FaChartBar, FaUser, FaSignOutAlt, FaUserGraduate, FaBars } from 'react-icons/fa';
 import { useAuth } from '../context/AuthContext';
+import { Helmet } from 'react-helmet-async';
 
 import TeacherHome from '../components/teacher/TeacherHome';
 import CreateSession from '../components/teacher/CreateSession';
@@ -10,6 +11,7 @@ import SessionHistory from '../components/teacher/SessionHistory';
 import TeacherAnalytics from '../components/teacher/TeacherAnalytics';
 import ManageStudents from '../components/teacher/ManageStudents';
 import TeacherProfile from '../components/teacher/TeacherProfile';
+
 
 const TeacherDashboard = () => {
   const { user, logout } = useAuth();

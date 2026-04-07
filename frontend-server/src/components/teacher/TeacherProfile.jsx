@@ -1,4 +1,5 @@
 import { FaUserCircle, FaEnvelope, FaIdBadge, FaShieldAlt } from 'react-icons/fa';
+import { Helmet } from 'react-helmet-async';
 import { useAuth } from '../../context/AuthContext';
 
 const TeacherProfile = () => {

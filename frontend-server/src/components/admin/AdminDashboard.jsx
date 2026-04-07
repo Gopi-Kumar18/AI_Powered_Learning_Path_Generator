@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Helmet } from 'react-helmet-async';
 import { FaUsers, FaChalkboardTeacher, FaServer, FaUserPlus, FaSignOutAlt } from 'react-icons/fa';
 import { getSystemStats, registerUser } from '../../services/adminService';
 import { useAuth } from '../../context/AuthContext';

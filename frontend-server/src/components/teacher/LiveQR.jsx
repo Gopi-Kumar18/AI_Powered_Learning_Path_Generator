@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { Helmet } from 'react-helmet-async';
 import { QRCodeSVG } from 'qrcode.react';
 import { getQrToken } from '../../services/qrAttendanceService.js';
 import { FaClock, FaSync, FaShieldAlt } from 'react-icons/fa'; 

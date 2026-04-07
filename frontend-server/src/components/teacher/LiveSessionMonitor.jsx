@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Helmet } from 'react-helmet-async';
 import { FaUserCheck, FaClock } from 'react-icons/fa';
 import { getLiveSessionLogs } from '../../services/qrAttendanceService';
 

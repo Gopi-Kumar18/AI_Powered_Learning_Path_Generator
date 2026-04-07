@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Helmet } from 'react-helmet-async';
 import { FaPlay, FaLayerGroup, FaBook } from 'react-icons/fa';
 import { startSession } from '../../services/qrAttendanceService';
 
