@@ -22,6 +22,11 @@ const ManageStudents = ({ onBack }) => {
 
   return (
     <div className="bg-white border border-slate-200 rounded-3xl p-10 shadow-sm animate-fade-in-up min-h-[500px]">
+
+      <Helmet>
+          <title>TeacherDB | Manage Students | SmartPathMaker</title>
+          <meta name="description" content="Teacher dashboard for managing the Students." />
+      </Helmet>
       
       <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-8 pb-6 gap-4">
         <div>

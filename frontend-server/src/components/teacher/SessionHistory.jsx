@@ -29,6 +29,12 @@ const SessionHistory = ({ onBack }) => {
 
   return (
     <div className="bg-white border border-slate-200 rounded-3xl p-10 shadow-sm animate-fade-in-up">
+
+      <Helmet>
+          <title>TeacherDB | Session History | SmartPathMaker</title>
+          <meta name="description" content="Teacher dashboard for managing session history." />
+      </Helmet>
+
       <div className="flex items-center justify-between mb-8 pb-4">
         <h2 className="text-3xl font-black text-slate-800 flex items-center gap-3">
           <FaCalendarAlt className="text-blue-600" /> Session History

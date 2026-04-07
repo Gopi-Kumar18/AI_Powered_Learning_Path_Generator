@@ -52,6 +52,11 @@ const AILearningPath = ({ onBack, onNavigateToAssessment }) => {
 
   return (
     <div className="max-w-5xl mx-auto animate-fade-in-up space-y-6">
+
+      <Helmet>
+          <title>StudentDB | AI Learning Path | SmartPathMaker</title>
+          <meta name="description" content="Generate personalized learning roadmaps with AI assistance." />
+      </Helmet>
       
       {/* Header */}
       <div className="flex items-center justify-between">

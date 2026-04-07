@@ -22,6 +22,12 @@ const TeacherAnalytics = ({ onBack }) => {
 
   return (
     <div className="animate-fade-in-up space-y-8">
+
+      <Helmet>
+          <title>TeacherDB | Teacher Analytics | SmartPathMaker</title>
+          <meta name="description" content="Teacher dashboard for managing teacher analytics." />
+      </Helmet>
+
       <div className="flex items-center justify-between">
         <h2 className="text-3xl font-black text-slate-800 flex items-center gap-3">
           <FaChartLine className="text-blue-600" /> Attendance Analytics

@@ -13,6 +13,11 @@ const TeacherHome = ({ onViewChange }) => {
 
   return (
     <div className="space-y-8 animate-fade-in-up">
+
+      <Helmet>
+          <title>TeacherDB | Teacher Home Page | SmartPathMaker</title>
+          <meta name="description" content="Teacher dashboard for managing the teacher's classes and students." />
+      </Helmet>
       
       {/* Welcome Banner */}
       <div className="bg-gradient-to-r from-blue-600 to-indigo-700 rounded-3xl p-10 text-white shadow-xl shadow-blue-900/10 relative overflow-hidden">

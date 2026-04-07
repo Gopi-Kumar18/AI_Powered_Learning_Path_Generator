@@ -21,6 +21,12 @@ const CreateSession = ({ onSessionStarted }) => {
 
   return (
     <div className="bg-white border border-slate-200 rounded-3xl p-10 shadow-sm relative overflow-hidden">
+
+      <Helmet>
+          <title>TeacherDB | Create Session | SmartPathMaker</title>
+          <meta name="description" content="Teacher dashboard for creating attendance sessions." />
+      </Helmet>
+
       <h2 className="text-2xl font-black text-slate-800 mb-8 flex items-center gap-3">
         <span className="w-1.5 h-8 bg-blue-600 rounded-full"></span>
         Configure Session

@@ -23,7 +23,11 @@ const LiveSessionMonitor = ({ sessionId }) => {
   return (
     <div className="bg-white rounded-3xl shadow-sm border border-slate-200 flex flex-col h-[500px] overflow-hidden">
       
-      {/* Header */}
+      <Helmet>
+          <title>TeacherDB | Live Session Monitor | SmartPathMaker</title>
+          <meta name="description" content="Teacher dashboard for managing live attendance sessions." />
+      </Helmet>
+
       <div className="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50">
         <div>
           <h3 className="font-black text-slate-800 text-xl flex items-center gap-3">

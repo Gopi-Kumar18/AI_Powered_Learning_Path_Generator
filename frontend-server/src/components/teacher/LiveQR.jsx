@@ -42,7 +42,11 @@ const LiveQR = ({ sessionId }) => {
   return (
     <div className="flex flex-col items-center justify-between p-8 bg-white rounded-3xl border border-slate-200 shadow-sm h-[500px]">
       
-      {/* Top Text Section */}
+      <Helmet>
+        <title>TeacherDB | LiveQR Running | SmartPathMaker</title>
+         <meta name="description" content="Teacher dashboard for managing live QR sessions." />
+      </Helmet>
+
       <div className="text-center w-full">
         <h2 className="text-2xl font-black text-slate-800 mb-4">
           Scan to Mark <span className="text-blue-600">Attendance</span>

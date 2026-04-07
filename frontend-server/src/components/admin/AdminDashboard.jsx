@@ -72,6 +72,11 @@ const subjects = [
 
   return (
     <div className="min-h-screen bg-gray-100 text-slate-800 font-sans p-6 md:p-12">
+
+        <Helmet>
+           <title>Admin Dashboard | SmartPathMaker</title>
+           <meta name="description" content="Admin dashboard for managing the SmartPathMaker system." />
+        </Helmet>
       
       {/* Header */}
       <div className="max-w-6xl mx-auto flex justify-between items-center mb-10">

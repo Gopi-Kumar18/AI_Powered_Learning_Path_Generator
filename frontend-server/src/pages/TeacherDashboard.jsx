@@ -34,6 +34,11 @@ const TeacherDashboard = () => {
 
   return (
     <div className="flex h-screen bg-slate-50 font-sans overflow-hidden">
+
+      <Helmet>
+          <title>Teacher Dashboard | SmartPathMaker</title>
+          <meta name="description" content="Teacher dashboard for managing classes and students." />
+      </Helmet>
       
       {/* SIDEBAR */}
       <div className={`bg-slate-900 text-white flex flex-col justify-between shadow-2xl z-20 transition-all duration-300 whitespace-nowrap ${isSidebarOpen ? 'w-64' : 'w-0 overflow-hidden'}`}>

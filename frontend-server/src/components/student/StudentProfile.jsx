@@ -31,7 +31,12 @@ const StudentProfile = ({ onBack }) => {
 
   return (
     <div className="max-w-4xl mx-auto animate-fade-in-up space-y-8">
-      {/* Header */}
+      
+      <Helmet>
+          <title>Student Dashboard | My Profile | SmartPathMaker</title>
+          <meta name="description" content="Manage your personal information and settings." />
+      </Helmet>
+
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold text-slate-800 flex items-center gap-3">
           <FaUser className="text-blue-600" /> My Profile

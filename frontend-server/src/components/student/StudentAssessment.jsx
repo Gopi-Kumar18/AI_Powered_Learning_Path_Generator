@@ -101,8 +101,6 @@ const submitQuiz = async () => {
   };
 
 
-  // --- RENDERING VIEWS ---
-
   if (quizState === 'LOADING') {
     return (
       <div className="flex flex-col items-center justify-center h-96 space-y-6 animate-pulse">
@@ -220,9 +218,14 @@ const submitQuiz = async () => {
     );
   }
 
-  // DEFAULT VIEW: SETUP
   return (
     <div className="max-w-3xl mx-auto animate-fade-in-up space-y-8">
+
+      <Helmet>
+          <title>StudentDB | Assessment Generator | SmartPathMaker</title>
+          <meta name="description" content="Take a custom assessment based on your attendance tier." />
+      </Helmet>
+
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-3xl font-extrabold text-slate-800 flex items-center gap-3">
