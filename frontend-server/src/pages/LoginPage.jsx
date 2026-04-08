@@ -167,20 +167,10 @@ const LoginPage = () => {
             
             <button
               onClick={() => navigate("/forgot-password")}
-              className="text-blue-600 hover:text-blue-700 transition-colors">
+              className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent hover:from-blue-700 hover:to-purple-700 transition-colors font-medium">
 
               Forgot Password?
 
-            </button>
-        
-            <span className="text-slate-300">|</span>
-        
-            <button
-              onClick={() => navigate("/change-password")}
-              className="text-purple-600 hover:text-purple-700 transition-colors">
-
-              Change Password
-              
             </button>
         
           </div>

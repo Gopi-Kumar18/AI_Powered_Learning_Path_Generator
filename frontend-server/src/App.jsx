@@ -3,6 +3,8 @@ import TeacherDashboard from './pages/TeacherDashboard';
 import StudentDashboard from './pages/StudentDashboard';
 import { AuthProvider, useAuth } from "./context/AuthContext";
 import LoginPage from "./pages/LoginPage";
+import ForgotPassword from './pages/ForgotPassword';
+import ResetPassword from './pages/ResetPassword';
 import AdminDashboard from './components/admin/AdminDashboard';
 
 const ProtectedRoute = ({ children, allowedRole }) => {
@@ -25,8 +27,13 @@ function App() {
     <AuthProvider>
       <BrowserRouter>
         <Routes>
+
+
           {/* Public Route */}
           <Route path="/" element={<LoginPage />} />
+
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
 
           {/* Teacher Only Route */}
           <Route 
@@ -48,7 +55,6 @@ function App() {
             } 
           />
 
-
           {/* Admin Only Route */}
           <Route 
             path="/adminDashboard" 
@@ -58,6 +64,8 @@ function App() {
               </ProtectedRoute>
             } 
           />
+
+
         </Routes>
       </BrowserRouter>
     </AuthProvider>

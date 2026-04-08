@@ -1,13 +1,15 @@
 import { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { FaUser, FaEnvelope, FaIdCard, FaFingerprint, FaShieldAlt, FaKey, FaArrowLeft } from 'react-icons/fa';
+import { FaUser, FaEnvelope, FaIdCard, FaFingerprint, FaShieldAlt, FaKey, FaArrowLeft, FaTimes } from 'react-icons/fa';
 import { getStudentProfile } from '../../services/qrAttendanceService';
 import { useAuth } from '../../context/AuthContext';
-
+import ChangePassword from '../../pages/ChangePassword';
 const StudentProfile = ({ onBack }) => {
   const { user } = useAuth();
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
+  
+  const [showPasswordForm, setShowPasswordForm] = useState(false);
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -31,13 +33,14 @@ const StudentProfile = ({ onBack }) => {
   }
 
   return (
-    <div className="max-w-4xl mx-auto animate-fade-in-up space-y-8">
+    <div className="max-w-4xl mx-auto animate-fade-in space-y-8">
       
       <Helmet>
-          <title>Student Dashboard | My Profile | SmartPathMaker</title>
+          <title>My Profile | SmartPathMaker</title>
           <meta name="description" content="Manage your personal information and settings." />
       </Helmet>
 
+      {/* Header */}
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold text-slate-800 flex items-center gap-3">
           <FaUser className="text-blue-600" /> My Profile
@@ -49,62 +52,77 @@ const StudentProfile = ({ onBack }) => {
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
         
-        {/* Left Col: Avatar & Status */}
         <div className="md:col-span-1 space-y-6">
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 flex flex-col items-center text-center">
-            <div className="w-32 h-32 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-5xl font-bold border-4 border-white shadow-lg mb-4">
+          <div className="bg-white rounded-3xl shadow-sm border border-slate-100 p-8 flex flex-col items-center text-center">
+            <div className="w-32 h-32 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center text-5xl font-extrabold border-4 border-white shadow-lg mb-4">
               {profile.name.charAt(0).toUpperCase()}
             </div>
             <h3 className="text-xl font-bold text-slate-800">{profile.name}</h3>
-            <p className="text-slate-500 font-mono mt-1">{profile.studentId}</p>
+            <p className="text-slate-500 font-mono mt-1 text-sm">{profile.studentId}</p>
             
-            <div className="mt-6 w-full flex items-center justify-center gap-2 bg-green-50 text-green-700 px-4 py-2 rounded-lg border border-green-100 font-medium text-sm">
+            <div className="mt-6 w-full flex items-center justify-center gap-2 bg-green-50 text-green-700 px-4 py-2.5 rounded-xl border border-green-100 font-bold text-sm">
               <FaFingerprint className="text-lg" />
-              Biometrics {profile.biometricStatus}
+              Biometrics {profile.biometricStatus || "Active"}
             </div>
           </div>
         </div>
 
-        {/* Right Col: Details & Settings */}
         <div className="md:col-span-2 space-y-6">
           
           {/* Personal Info Card */}
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-            <h4 className="text-lg font-bold text-slate-800 mb-6 border-b border-gray-100 pb-2">Personal Information</h4>
+          <div className="bg-white rounded-3xl shadow-sm border border-slate-100 p-8">
+            <h4 className="text-lg font-bold text-slate-800 mb-6 border-b border-slate-100 pb-4">Personal Information</h4>
             <div className="space-y-6">
               <div className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-slate-50 text-slate-500 rounded-xl flex items-center justify-center text-xl"><FaIdCard /></div>
+                <div className="w-12 h-12 bg-slate-50 text-slate-500 rounded-2xl flex items-center justify-center text-xl"><FaIdCard /></div>
                 <div>
-                  <p className="text-xs font-bold text-slate-400 uppercase">Registration Number</p>
-                  <p className="font-semibold text-slate-800">{profile.studentId}</p>
+                  <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-0.5">Registration Number</p>
+                  <p className="font-bold text-slate-800">{profile.studentId}</p>
                 </div>
               </div>
               <div className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-slate-50 text-slate-500 rounded-xl flex items-center justify-center text-xl"><FaEnvelope /></div>
+                <div className="w-12 h-12 bg-slate-50 text-slate-500 rounded-2xl flex items-center justify-center text-xl"><FaEnvelope /></div>
                 <div>
-                  <p className="text-xs font-bold text-slate-400 uppercase">Email Address</p>
-                  <p className="font-semibold text-slate-800">{profile.email}</p>
+                  <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-0.5">Email Address</p>
+                  <p className="font-bold text-slate-800">{profile.email}</p>
                 </div>
               </div>
               <div className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-slate-50 text-slate-500 rounded-xl flex items-center justify-center text-xl"><FaShieldAlt /></div>
+                <div className="w-12 h-12 bg-slate-50 text-slate-500 rounded-2xl flex items-center justify-center text-xl"><FaShieldAlt /></div>
                 <div>
-                  <p className="text-xs font-bold text-slate-400 uppercase">Account Role</p>
-                  <p className="font-semibold text-slate-800 capitalize">{profile.role.toLowerCase()}</p>
+                  <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-0.5">Account Role</p>
+                  <p className="font-bold text-slate-800 capitalize">{profile.role.toLowerCase()}</p>
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Quick Actions Card */}
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-            <h4 className="text-lg font-bold text-slate-800 mb-6 border-b border-gray-100 pb-2">Account Security</h4>
-            <button className="w-full flex items-center justify-between p-4 bg-slate-50 hover:bg-blue-50 hover:text-blue-700 text-slate-700 rounded-xl transition-colors border border-transparent hover:border-blue-100 font-medium">
-              <div className="flex items-center gap-3">
-                <FaKey className="text-lg" /> Change Password
-              </div>
-              <span className="text-xs bg-white shadow-sm border border-gray-200 px-2 py-1 rounded">Update</span>
-            </button>
+          {/* Account Security Card */}
+          <div className="bg-white rounded-3xl shadow-sm border border-slate-100 p-8 transition-all duration-300">
+            <div className="flex items-center justify-between mb-6 border-b border-slate-100 pb-4">
+               <h4 className="text-lg font-bold text-slate-800">Account Security</h4>
+               {showPasswordForm && (
+                  <button onClick={() => setShowPasswordForm(false)} className="text-slate-400 hover:text-red-500 transition-colors p-2">
+                     <FaTimes size={18} />
+                  </button>
+               )}
+            </div>
+
+            {!showPasswordForm ? (
+               <button 
+                 onClick={() => setShowPasswordForm(true)} 
+                 className="w-full flex items-center justify-between p-4 bg-slate-50 hover:bg-blue-50 hover:text-blue-700 text-slate-700 rounded-2xl transition-all border border-slate-100 hover:border-blue-200 font-bold shadow-sm"
+               >
+                 <div className="flex items-center gap-3">
+                   <FaKey className="text-lg text-slate-400" /> Update Password
+                 </div>
+                 <span className="text-xs bg-white shadow-sm border border-slate-200 px-3 py-1.5 rounded-lg text-slate-500">Edit</span>
+               </button>
+            ) : (
+               <div className="animate-fade-in-up">
+                  <ChangePassword />
+               </div>
+            )}
           </div>
 
         </div>
