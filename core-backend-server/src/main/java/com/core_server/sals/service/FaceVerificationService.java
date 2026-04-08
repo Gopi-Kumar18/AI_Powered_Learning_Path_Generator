@@ -1,7 +1,5 @@
 package com.core_server.sals.service;
 
-
-
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -12,6 +10,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.beans.factory.annotation.Value;
 
 import java.io.IOException;
 import java.util.Map;
@@ -20,8 +19,8 @@ import java.util.Map;
 public class FaceVerificationService {
 
     // The URL of your AI-backend-server
-//    private final String AI_SERVER_URL = "http://localhost:8000/verify-face";
-    private final String AI_SERVER_URL = "https://ai-smartpathmaker.up.railway.app/verify-face";
+    @Value("${ai.server.url}")
+    private String AI_SERVER_URL;
     private final RestTemplate restTemplate = new RestTemplate();
 
     // ----- 1. Face Validation Service method for veryfying a student's face(FastAPI Backend) -----

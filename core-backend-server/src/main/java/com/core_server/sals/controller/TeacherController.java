@@ -20,7 +20,6 @@ import java.util.LinkedHashMap;
 
 @RestController
 @RequestMapping("/api/teacher")
-@CrossOrigin(origins = "*")
 public class TeacherController {
 
     @Autowired private AttendanceRepository attendanceRepository;

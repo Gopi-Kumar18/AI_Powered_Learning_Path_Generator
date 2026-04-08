@@ -20,7 +20,6 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/admin")
-@CrossOrigin(origins = "*")
 public class AdminController {
 
     @Autowired private UserRepository userRepository;

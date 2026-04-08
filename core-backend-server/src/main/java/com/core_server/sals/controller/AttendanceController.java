@@ -25,7 +25,6 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/attendance")
-@CrossOrigin(origins = "*")
 public class AttendanceController {
 
     @Autowired private QRCodeService qrCodeService;
