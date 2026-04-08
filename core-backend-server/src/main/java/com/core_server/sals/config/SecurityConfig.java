@@ -55,7 +55,7 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
 
-        configuration.setAllowedOrigins(List.of("http://localhost:5173", "https://smartpathmaker.vercel.app")); //Note :- For ""https://ai-smartpathmaker.up.railway.app"" Not needed (server-to-server, no CORS)
+        configuration.setAllowedOrigins(List.of("http://localhost:5173", "https://7fdblmk4-5173.inc1.devtunnels.ms", "https://smartpathmaker.vercel.app")); //Note :- For ""https://ai-smartpathmaker.up.railway.app"" Not needed (server-to-server, no CORS)
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
 
         configuration.setAllowedHeaders(List.of("*"));
