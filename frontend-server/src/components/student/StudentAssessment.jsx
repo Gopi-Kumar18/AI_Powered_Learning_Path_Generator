@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { FaBrain, FaArrowLeft, FaCheckCircle, FaTimesCircle, FaPlay } from 'react-icons/fa';
 import { generateAIQuiz, submitQuizScore, getComprehensiveAILearningPath } from '../../services/qrAttendanceService';
@@ -29,7 +29,7 @@ const StudentAssessment = ({ onBack }) => {
   }, []);
 
   const startQuiz = async () => {
-    if (!selectedSubject) return;
+    if (!selectedSubjectCode) return;
     setQuizState('LOADING');
 
     const result = await generateAIQuiz(user.userId, selectedSubjectCode);

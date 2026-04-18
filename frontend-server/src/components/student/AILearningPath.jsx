@@ -1,18 +1,21 @@
-import { useState, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Helmet } from 'react-helmet-async';
 import ReactMarkdown from 'react-markdown';
 import { FaRobot, FaMagic, FaBookOpen, FaArrowLeft, FaBrain, FaFilePdf } from 'react-icons/fa';
 import { getAILearningPath } from '../../services/qrAttendanceService';
+// NEW: Import the shared subject fetcher
+import { getAllSubjects } from '../../services/adminService'; 
 import { useAuth } from '../../context/AuthContext';
 import html2pdf from 'html2pdf.js';
 
 const AILearningPath = ({ onBack, onNavigateToAssessment }) => {
   const { user } = useAuth();
   
-  // Available subjects (Matches our Timetable)
-  const subjects = ["Java Programming", "DSA", "OS", "Computer Networks", "Verbal Ability", "OS LAB"];
-  
-  const [selectedSubject, setSelectedSubject] = useState('');
+  // NEW: Dynamic states for subjects
+  const [availableSubjects, setAvailableSubjects] = useState([]);
+  const [selectedSubjectCode, setSelectedSubjectCode] = useState('');
+  const [selectedSubjectName, setSelectedSubjectName] = useState(''); // Keeps track of the name for the UI and PDF
+
   const [roadmap, setRoadmap] = useState(null);
   const [loading, setLoading] = useState(false);
   const [generating, setGenerating] = useState(false);
@@ -20,13 +23,29 @@ const AILearningPath = ({ onBack, onNavigateToAssessment }) => {
 
   const roadmapRef = useRef();
 
-  const fetchPath = async (subject) => {
-    if (!subject) return;
-    setSelectedSubject(subject);
+  // NEW: Fetch subjects when component loads
+  useEffect(() => {
+    const fetchSubjects = async () => {
+      const data = await getAllSubjects();
+      setAvailableSubjects(data);
+    };
+    fetchSubjects();
+  }, []);
+
+  const fetchPath = async (code) => {
+    if (!code) return;
+    
+    setSelectedSubjectCode(code);
+    
+    // Find the actual name of the subject so we can make the UI look nice
+    const foundSubject = availableSubjects.find(s => s.code === code);
+    setSelectedSubjectName(foundSubject ? foundSubject.name : code);
+
     setLoading(true);
     setRoadmap(null); 
 
-    const result = await getAILearningPath(user.userId, subject);
+    // Passing the String subjectCode to the API
+    const result = await getAILearningPath(user.userId, code);
     
     if (result.status === 'SUCCESS') {
       setRoadmap(result.data.aiGeneratedRoadmap);
@@ -41,7 +60,8 @@ const AILearningPath = ({ onBack, onNavigateToAssessment }) => {
 
     const options = {
       margin:       [15, 15, 15, 15], 
-      filename:     `${selectedSubject}_AI_Roadmap.pdf`.replace(/\s+/g, '_'),
+      // Uses the clean subject name for the downloaded file
+      filename:     `${selectedSubjectName}_AI_Roadmap.pdf`.replace(/\s+/g, '_'),
       image:        { type: 'jpeg', quality: 0.98 },
       html2canvas:  { scale: 2, useCORS: true }, 
       jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
@@ -76,19 +96,22 @@ const AILearningPath = ({ onBack, onNavigateToAssessment }) => {
       <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col md:flex-row items-center gap-4">
         <div className="flex-1 w-full">
           <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Select Subject</label>
+          
+          {/* UPDATED: Dynamic Select Input mapping over availableSubjects */}
           <select 
-            value={selectedSubject} 
+            value={selectedSubjectCode} 
             onChange={(e) => fetchPath(e.target.value)}
-            className="w-full border border-gray-200 rounded-xl p-3 focus:ring-2 focus:ring-purple-500 outline-none font-bold text-slate-700 bg-slate-50"
+            className="w-full border border-gray-200 rounded-xl p-3 focus:ring-2 focus:ring-purple-500 outline-none font-bold text-slate-700 bg-slate-50 appearance-none"
           >
-            <option value="">-- Choose a Subject --</option>
-            {subjects.map(sub => (
-              <option key={sub} value={sub}>{sub}</option>
+            <option value="">-- Choose an Official Subject --</option>
+            {availableSubjects.map(sub => (
+              <option key={sub.code} value={sub.code}>
+                {sub.name} ({sub.code})
+              </option>
             ))}
           </select>
         </div>
         
-        { /* This button now redirects to the Assessment View */}
         <button 
           onClick={onNavigateToAssessment}
           className="w-full md:w-auto mt-6 md:mt-0 px-6 py-3 rounded-xl font-bold flex items-center justify-center gap-2 transition-all shadow-lg bg-gradient-to-r from-purple-600 to-indigo-600 text-white hover:from-purple-700 hover:to-indigo-700 shadow-purple-500/30">
@@ -98,9 +121,9 @@ const AILearningPath = ({ onBack, onNavigateToAssessment }) => {
       </div>
 
       {/* AI Output Canvas */}
-      <div className="bg-white min-h-[400px] rounded-2xl shadow-sm border border-gray-100 p-8">
+      <div className="bg-white min-h-[400px] rounded-2xl shadow-sm border border-gray-100 p-8 relative">
 
-        {/* NEW: Download Button - Only shows if roadmap exists */}
+        {/* Download Button - Only shows if roadmap exists */}
         {roadmap && (
           <div className="absolute top-6 right-6 z-10">
             <button 
@@ -136,7 +159,7 @@ const AILearningPath = ({ onBack, onNavigateToAssessment }) => {
            <div ref={roadmapRef} className="pt-4 pb-10 px-2">
             
              <div className="mb-8 border-b-2 border-slate-100 pb-6">
-                <h1 className="text-4xl font-black text-slate-800 tracking-tight">{selectedSubject}</h1>
+                <h1 className="text-4xl font-black text-slate-800 tracking-tight">{selectedSubjectName}</h1>
                 <p className="text-slate-500 font-bold mt-2 uppercase tracking-wider">SmartPathMaker Custom Learning Roadmap</p>
              </div>
 
@@ -157,11 +180,11 @@ const AILearningPath = ({ onBack, onNavigateToAssessment }) => {
              <ReactMarkdown>{roadmap}</ReactMarkdown>
            </div>
           </div>
-        ) : selectedSubject ? (
+        ) : selectedSubjectCode ? (
            <div className="h-full flex flex-col items-center justify-center text-slate-400 py-20">
              <FaBookOpen className="text-5xl mb-4 opacity-20" />
              <p className="font-bold">No roadmap exists for this subject yet.</p>
-             <p className="text-sm">Click "Generate Fresh Roadmap" to create one!</p>
+             <p className="text-sm">Click "Take Assessment to Generate" to create one!</p>
            </div>
         ) : (
            <div className="h-full flex items-center justify-center text-slate-400 py-20">

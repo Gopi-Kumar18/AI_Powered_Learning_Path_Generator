@@ -174,9 +174,9 @@ export const getComprehensiveAILearningPath = async (studentId, subjectCode) => 
 
 
 // ----- 13. Get AI Learning Path (for personalized learning) {payload: { studentId: "12345678", subject: "JAVA PROGRAMMING" }} -----
-export const getAILearningPath = async (studentId, subject) => {
+export const getAILearningPath = async (studentId, subjectCode) => {
   try {
-    const response = await axios.get(`${BASE_API_URL}/api/ai/path/${studentId}/${subject}`);
+    const response = await axios.get(`${BASE_API_URL}/api/ai/path/${studentId}/${subjectCode}`);
     return response.data;
   } catch (error) {
     console.error("Failed to fetch AI path", error);
