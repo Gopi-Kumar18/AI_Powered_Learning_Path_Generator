@@ -1,9 +1,8 @@
 import { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { FaUsers, FaChalkboardTeacher, FaServer, FaUserPlus, FaSignOutAlt } from 'react-icons/fa';
-import { getSystemStats, registerUser } from '../../services/adminService';
+import { FaUsers, FaChalkboardTeacher, FaServer, FaUserPlus, FaSignOutAlt, FaBookOpen } from 'react-icons/fa';
+import { getSystemStats, registerUser, createNewSubject, getAllSubjects, uploadSubjectSyllabus } from '../../services/adminService';
 import { useAuth } from '../../context/AuthContext';
-import { uploadSubjectSyllabus } from '../../services/adminService';
 import  SystemAudit  from "./SystemAudit"
 
 
@@ -15,27 +14,24 @@ const AdminDashboard = () => {
   const [formData, setFormData] = useState({ customId: '', name: '', email: '', password: '', role: 'STUDENT' });
   const [message, setMessage] = useState(null);
   const [selectedFile, setSelectedFile] = useState(null);
-  const [uploadSubjectId, setUploadSubjectId] = useState('');
+  const [uploadSubjectCode, setUploadSubjectCode] = useState('');
   const [uploadMessage, setUploadMessage] = useState(null);
   const [isUploading, setIsUploading] = useState(false);
+  const [subjects, setSubjects] = useState([]); 
+  const [newSubject, setNewSubject] = useState({ subjectCode: '', name: '' });
+  const [subjectMsg, setSubjectMsg] = useState(null);
+  const [isCreatingSubject, setIsCreatingSubject] = useState(false);
 
-const subjects = [
-    
-    { id: 5, name: "OS" },
-    { id: 2, name: "DSA" },
-    { id: 3, name: "OS LAB" },
-    { id: 4, name: "Verbal Ability" },
-    { id: 1, name: "Java Programming" },
-    { id: 6, name: "Computer Networks" },
-    
-];
 
   useEffect(() => {
-    const fetchStats = async () => {
-      const data = await getSystemStats();
-      if (data) setStats(data);
+    const fetchData = async () => {
+      const statsData = await getSystemStats();
+      if (statsData) setStats(statsData);
+
+      const subjectsData = await getAllSubjects();
+      setSubjects(subjectsData);
     };
-    fetchStats();
+    fetchData();
   }, []);
 
   const handleRegister = async (e) => {
@@ -43,7 +39,7 @@ const subjects = [
     const result = await registerUser(formData);
     setMessage(result);
     if (result.status === 'SUCCESS') {
-      setFormData({ customId: '', name: '', email: '', password: '', role: 'STUDENT' }); // Reset form
+      setFormData({ customId: '', name: '', email: '', password: '', role: 'STUDENT' });
       const updatedStats = await getSystemStats(); 
       if (updatedStats) setStats(updatedStats);
     }
@@ -53,13 +49,13 @@ const subjects = [
 
   const handleFileUpload = async (e) => {
     e.preventDefault();
-    if (!selectedFile || !uploadSubjectId) {
+    if (!selectedFile || !uploadSubjectCode) {
       setUploadMessage({ status: 'ERROR', message: 'Please select a subject and a file.' });
       return;
     }
 
     setIsUploading(true);
-    const result = await uploadSubjectSyllabus(uploadSubjectId, selectedFile);
+    const result = await uploadSubjectSyllabus(uploadSubjectCode, selectedFile);
     setUploadMessage(result);
     setIsUploading(false);
 
@@ -70,6 +66,23 @@ const subjects = [
     
     setTimeout(() => setUploadMessage(null), 4000);
   };
+
+  const handleCreateSubject = async (e) => {
+    e.preventDefault();
+    setIsCreatingSubject(true);
+    
+    const result = await createNewSubject(newSubject);
+    setSubjectMsg(result);
+    setIsCreatingSubject(false);
+
+    if (result.status === 'SUCCESS') {
+      setNewSubject({ subjectCode: '', name: '' });
+      const updatedSubjects = await getAllSubjects();
+      setSubject(updatedSubjects);
+    }
+    
+    setTimeout(() => setSubjectMsg(null), 4000);
+};
 
   return (
     <div className="min-h-screen bg-gray-100 text-slate-800 font-sans p-6 md:p-12">
@@ -82,7 +95,7 @@ const subjects = [
       {/* Header */}
       <div className="max-w-6xl mx-auto flex justify-between items-center mb-10">
         <div>
-          <h1 className="text-3xl font-extrabold text-slate-900">SALS Admin Control</h1>
+          <h1 className="text-3xl font-extrabold text-slate-900">SmartPathMaker Admin Control</h1>
           <p className="text-slate-500">System overview and user management</p>
         </div>
         <button onClick={logout} className="bg-red-50 text-red-600 hover:bg-red-100 px-4 py-2 rounded-lg font-bold flex items-center gap-2 transition">
@@ -160,8 +173,55 @@ const subjects = [
           </form>
         </div>
 
+        {/* --- Create Subject Card --- */}
+        <div className="lg:col-span-3 bg-white rounded-2xl shadow-sm border border-gray-200 p-8 mt-4">
+          <h2 className="text-xl font-bold flex items-center gap-2 mb-6 border-b pb-4">
+            <FaBookOpen className="text-blue-600" /> Register New Subject
+          </h2>
+          
+          {subjectMsg && (
+            <div className={`p-4 rounded-lg mb-6 font-bold text-sm ${subjectMsg.status === 'SUCCESS' ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-red-50 text-red-700 border border-red-200'}`}>
+              {subjectMsg.message}
+            </div>
+          )}
 
-        {/* --- NEW: Syllabus Upload Card --- */}
+          <form onSubmit={handleCreateSubject} className="flex flex-col md:flex-row items-end gap-6">
+            <div className="w-full md:w-1/3">
+              <label className="block text-sm font-bold text-slate-500 mb-2">Subject Name</label>
+              <input 
+                type="text" 
+                required 
+                value={newSubject.name} 
+                onChange={(e) => setNewSubject({...newSubject, name: e.target.value})} 
+                className="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-blue-500 outline-none" 
+                placeholder="e.g. Operating Systems" 
+              />
+            </div>
+            
+            <div className="w-full md:w-1/3">
+              <label className="block text-sm font-bold text-slate-500 mb-2">Subject Code (Unique)</label>
+              <input 
+                type="text" 
+                required 
+                value={newSubject.subjectCode} 
+                onChange={(e) => setNewSubject({...newSubject, subjectCode: e.target.value.toUpperCase()})} 
+                className="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-blue-500 outline-none uppercase" 
+                placeholder="e.g. OS2026" 
+              />
+            </div>
+            
+            <button 
+              type="submit" 
+              disabled={isCreatingSubject || !newSubject.name || !newSubject.subjectCode}
+              className="w-full md:w-auto bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white font-bold py-3 px-8 rounded-lg transition shadow-lg shadow-blue-500/30 whitespace-nowrap"
+            >
+              {isCreatingSubject ? 'Creating...' : 'Create Subject'}
+            </button>
+          </form>
+        </div>
+
+
+        {/* --- Syllabus Upload Card --- */}
         <div className="lg:col-span-3 bg-white rounded-2xl shadow-sm border border-gray-200 p-8 mt-4">
           <h2 className="text-xl font-bold flex items-center gap-2 mb-6 border-b pb-4">
             <span className="text-2xl text-purple-600">📄</span> Upload Subject Syllabus (PDF)
@@ -177,13 +237,13 @@ const subjects = [
             <div className="w-full md:w-1/3">
               <label className="block text-sm font-bold text-slate-500 mb-2">Select Subject</label>
               <select 
-                value={uploadSubjectId} 
-                onChange={(e) => setUploadSubjectId(e.target.value)} 
+                value={uploadSubjectCode} 
+                onChange={(e) => setUploadSubjectCode(e.target.value)} 
                 className="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-purple-500 outline-none font-bold text-slate-700"
               >
                 <option value="">-- Choose Subject --</option>
                 {subjects.map(sub => (
-                  <option key={sub.id} value={sub.id}>{sub.name}</option>
+                  <option key={sub.code} value={sub.code}>{sub.name} ({sub.code})</option>
                 ))}
               </select>
             </div>
@@ -201,7 +261,7 @@ const subjects = [
             
             <button 
               type="submit" 
-              disabled={isUploading || !selectedFile || !uploadSubjectId}
+              disabled={isUploading || !selectedFile || !uploadSubjectCode}
               className="w-full md:w-auto bg-purple-600 hover:bg-purple-700 disabled:bg-gray-400 text-white font-bold py-3 px-8 rounded-lg transition shadow-lg shadow-purple-500/30 whitespace-nowrap"
             >
               {isUploading ? 'Extracting & Saving...' : 'Upload & Parse PDF'}

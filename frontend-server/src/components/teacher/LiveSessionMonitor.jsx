@@ -25,7 +25,7 @@ const LiveSessionMonitor = ({ sessionId }) => {
     <div className="bg-white rounded-3xl shadow-sm border border-slate-200 flex flex-col h-[500px] overflow-hidden">
       
       <Helmet>
-          <title>TeacherDB | Live Session Monitor | SmartPathMaker</title>
+          <title>TeacherDashboard | Live Session Monitor | SmartPathMaker</title>
           <meta name="description" content="Teacher dashboard for managing live attendance sessions." />
       </Helmet>
 

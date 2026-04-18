@@ -9,7 +9,7 @@ const TeacherProfile = () => {
     <div className="max-w-3xl mx-auto animate-fade-in-up">
 
       <Helmet>
-          <title>TeacherDB | Teacher Profile | SmartPathMaker</title>
+          <title>TeacherDashboard | My Profile | SmartPathMaker</title>
           <meta name="description" content="Teacher profile page for managing personal information." />
       </Helmet>
       <div className="bg-white border border-slate-200 rounded-3xl shadow-sm overflow-hidden">

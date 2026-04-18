@@ -2,21 +2,13 @@ import { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { FaBrain, FaArrowLeft, FaCheckCircle, FaTimesCircle, FaPlay } from 'react-icons/fa';
 import { generateAIQuiz, submitQuizScore, getComprehensiveAILearningPath } from '../../services/qrAttendanceService';
+import { getAllSubjects } from '../../services/adminService';
 import { useAuth } from '../../context/AuthContext';
 import ReactMarkdown from 'react-markdown';
 
 const StudentAssessment = ({ onBack }) => {
   const { user } = useAuth();
   
-
-    const subjects = [
-    { id: 5, name: "OS" },
-    { id: 2, name: "DSA" },
-    { id: 3, name: "OS LAB" },
-    { id: 4, name: "Verbal Ability" },
-    { id: 1, name: "Java Programming" },
-    { id: 6, name: "Computer Networks" },
-  ];
 
   const [selectedSubject, setSelectedSubject] = useState('');
   const [quizState, setQuizState] = useState('SETUP'); 
@@ -25,12 +17,22 @@ const StudentAssessment = ({ onBack }) => {
   const [selectedAnswers, setSelectedAnswers] = useState({});
   const [score, setScore] = useState(0);
   const [finalRoadmap, setFinalRoadmap] = useState(null);
+  const [availableSubjects, setAvailableSubjects] = useState([]);
+  const [selectedSubjectCode, setSelectedSubjectCode] = useState('');
+
+  useEffect(() => {
+    const fetchSubjects = async () => {
+      const data = await getAllSubjects();
+      setAvailableSubjects(data);
+    };
+    fetchSubjects();
+  }, []);
 
   const startQuiz = async () => {
     if (!selectedSubject) return;
     setQuizState('LOADING');
 
-    const result = await generateAIQuiz(user.userId, selectedSubject);
+    const result = await generateAIQuiz(user.userId, selectedSubjectCode);
     
     if (result.status === 'SUCCESS') {
       try {
@@ -72,8 +74,6 @@ const submitQuiz = async () => {
           finalScore += 1;
         }
         //  else {
-        //   // Optional: Helpful for debugging! You can look in your browser console (F12) 
-        //   // to see exactly what Gemini generated vs what you clicked.
         //   console.log(`Mismatch at Q${index + 1} -> Selected: "${selected}" | AI Expected: "${correct}"`);
         // }
       }
@@ -81,7 +81,7 @@ const submitQuiz = async () => {
     
     setScore(finalScore);
 
-    await submitQuizScore(user.userId, selectedSubject, finalScore);
+    await submitQuizScore(user.userId, selectedSubjectCode, finalScore);
 
     setQuizState('FINISHED');
   };
@@ -90,7 +90,7 @@ const submitQuiz = async () => {
  const handleGenerateRoadmap = async () => {
     setQuizState('LOADING_ROADMAP');
     
-    const result = await getComprehensiveAILearningPath(user.userId, selectedSubject);
+    const result = await getComprehensiveAILearningPath(user.userId, selectedSubjectCode);
     
     if (result.status === 'SUCCESS') {
       setFinalRoadmap(result.roadmap);
@@ -112,14 +112,12 @@ const submitQuiz = async () => {
     );
   }
 
-
   if (quizState === 'FINISHED') {
     const percentage = (score / quizData.length) * 100;
     return (
       <div className="max-w-3xl mx-auto bg-white p-10 rounded-3xl shadow-sm border border-gray-100 text-center animate-fade-in-up">
         <h2 className="text-4xl font-black text-slate-800 mb-4">Assessment Complete!</h2>
-        <div className="w-40 h-40 mx-auto rounded-full flex items-center justify-center text-5xl font-bold border-8 mb-8 shadow-lg
-          ${percentage >= 75 ? 'border-green-400 text-green-600 bg-green-50' : 'border-orange-400 text-orange-600 bg-orange-50'}">
+        <div className={`w-40 h-40 mx-auto rounded-full flex items-center justify-center text-5xl font-bold border-8 mb-8 shadow-lg ${percentage >= 75 ? 'border-green-400 text-green-600 bg-green-50' : 'border-orange-400 text-orange-600 bg-orange-50'}`}>
           {score}/{quizData.length}
         </div>
         <p className="text-lg text-slate-600 mb-8 font-medium">
@@ -157,20 +155,15 @@ const submitQuiz = async () => {
           <button onClick={() => setQuizState('SETUP')} className="text-red-500 font-bold text-sm hover:underline">Quit Exam</button>
         </div>
         
-        {/* Progress Bar */}
         <div className="w-full bg-slate-100 h-2 rounded-full mb-8 overflow-hidden">
           <div className="bg-purple-600 h-full transition-all duration-300" style={{ width: `${progress}%` }}></div>
         </div>
 
-        {/* Question Card */}
         <div className="bg-white p-8 rounded-3xl shadow-sm border border-gray-100">
-
         <div className="prose prose-lg max-w-none mb-8 prose-p:font-bold prose-p:text-slate-800 prose-p:leading-relaxed prose-pre:bg-slate-900 prose-pre:text-slate-50 prose-pre:p-5 prose-pre:rounded-xl prose-code:text-purple-600 prose-code:font-mono prose-code:bg-purple-50 prose-code:px-1 prose-code:rounded">
             <ReactMarkdown>{question.question}</ReactMarkdown>
         </div>
 
-          {/* <h3 className="text-2xl font-bold text-slate-800 mb-8 leading-relaxed">{question.question}</h3> */}
-          
           <div className="space-y-4">
             {question.options.map((opt, idx) => (
               <button 
@@ -186,7 +179,6 @@ const submitQuiz = async () => {
             ))}
           </div>
 
-          {/* Navigation */}
           <div className="flex justify-between mt-10 pt-6 border-t border-slate-100">
             <button 
               disabled={currentIndex === 0}
@@ -221,9 +213,8 @@ const submitQuiz = async () => {
 
   return (
     <div className="max-w-3xl mx-auto animate-fade-in-up space-y-8">
-
       <Helmet>
-          <title>StudentDB | Assessment Generator | SmartPathMaker</title>
+          <title>Assessment Generator | SmartPathMaker</title>
           <meta name="description" content="Take a custom assessment based on your attendance tier." />
       </Helmet>
 
@@ -241,20 +232,24 @@ const submitQuiz = async () => {
 
       <div className="bg-white p-8 rounded-3xl shadow-sm border border-gray-100">
         <label className="block text-sm font-bold text-slate-500 uppercase tracking-wider mb-3">Select Subject</label>
+        
+        {/* UPDATED: Dynamic Select Input mapping over availableSubjects */}
         <select 
-          value={selectedSubject} 
-          onChange={(e) => setSelectedSubject(e.target.value)}
-          className="w-full border-2 border-slate-200 rounded-xl p-4 focus:border-purple-500 outline-none font-bold text-slate-700 bg-slate-50 mb-8"
+          value={selectedSubjectCode} 
+          onChange={(e) => setSelectedSubjectCode(e.target.value)}
+          className="w-full border-2 border-slate-200 rounded-xl p-4 focus:border-purple-500 outline-none font-bold text-slate-700 bg-slate-50 mb-8 appearance-none"
         >
-          <option value="">-- Choose a Subject --</option>
-          {subjects.map(sub => (
-            <option key={sub.id} value={sub.id}>{sub.name}</option>
+          <option value="">-- Choose an Official Subject --</option>
+          {availableSubjects.map(sub => (
+            <option key={sub.code} value={sub.code}>
+              {sub.name} ({sub.code})
+            </option>
           ))}
         </select>
         
         <button 
           onClick={startQuiz}
-          disabled={!selectedSubject}
+          disabled={!selectedSubjectCode}
           className="w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 disabled:opacity-50 text-white font-bold text-lg py-4 rounded-xl shadow-xl shadow-purple-500/30 transition flex items-center justify-center gap-3"
         >
           <FaPlay /> Start Evaluation

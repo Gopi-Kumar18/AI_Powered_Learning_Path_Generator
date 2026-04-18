@@ -44,7 +44,7 @@ const LiveQR = ({ sessionId }) => {
     <div className="flex flex-col items-center justify-between p-8 bg-white rounded-3xl border border-slate-200 shadow-sm h-[500px]">
       
       <Helmet>
-        <title>TeacherDB | LiveQR Running | SmartPathMaker</title>
+        <title>TeacherDashboard | LiveQR Running | SmartPathMaker</title>
          <meta name="description" content="Teacher dashboard for managing live QR sessions." />
       </Helmet>
 

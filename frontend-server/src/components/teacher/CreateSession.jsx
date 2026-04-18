@@ -1,21 +1,33 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { FaPlay, FaLayerGroup, FaBook } from 'react-icons/fa';
 import { startSession } from '../../services/qrAttendanceService';
+import { getAllSubjects } from '../../services/adminService';
 
 const CreateSession = ({ onSessionStarted }) => {
-  const [subject, setSubject] = useState('');
+  const [subjectCode, setSubjectCode] = useState('');
   const [batch, setBatch] = useState('');
   const [loading, setLoading] = useState(false);
+  const [availableSubjects, setAvailableSubjects] = useState([]);
+
+
+    useEffect(() => {
+      const fetchSubjects = async () => {
+        const data = await getAllSubjects();
+        setAvailableSubjects(data);
+      };
+      fetchSubjects();
+    }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    const data = await startSession(subject, batch);
-    if (data && data.sessionId) {
+    const data = await startSession(subjectCode, batch);
+    if (data && data.status === "SUCCESS" && data.sessionId) {
         onSessionStarted(data.sessionId); 
     } else {
-        alert("Failed to start session. Check console.");
+      console.log(data?.message);
+        alert("Failed to start session.");
     }
     setLoading(false);
   };
@@ -24,7 +36,7 @@ const CreateSession = ({ onSessionStarted }) => {
     <div className="bg-white border border-slate-200 rounded-3xl p-10 shadow-sm relative overflow-hidden">
 
       <Helmet>
-          <title>TeacherDB | Create Session | SmartPathMaker</title>
+          <title>TeacherDashboard | Create Session | SmartPathMaker</title>
           <meta name="description" content="Teacher dashboard for creating attendance sessions." />
       </Helmet>
 
@@ -35,17 +47,22 @@ const CreateSession = ({ onSessionStarted }) => {
 
       <form onSubmit={handleSubmit} className="space-y-6 relative z-10">
         <div className="group">
-          <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Subject Name</label>
+          <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Select Subject</label>
           <div className="relative">
-            <FaBook className="absolute left-4 top-4 text-slate-400 group-focus-within:text-blue-600 transition-colors" />
-            <input
-              type="text"
+            <FaBook className="absolute left-4 top-4 text-slate-400 group-focus-within:text-blue-600 transition-colors z-10" />
+            <select
               required
-              className="w-full bg-slate-50 border border-slate-200 rounded-xl py-3 pl-12 pr-4 text-slate-800 font-bold placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all"
-              placeholder="e.g. Advanced Data Structures"
-              value={subject}
-              onChange={(e) => setSubject(e.target.value)}
-            />
+              className="w-full bg-slate-50 border border-slate-200 rounded-xl py-3 pl-12 pr-4 text-slate-800 font-bold focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all appearance-none"
+              value={subjectCode}
+              onChange={(e) => setSubjectCode(e.target.value)}
+            >
+              <option value="" disabled>-- Choose an Official Subject --</option>
+              {availableSubjects.map(sub => (
+                <option key={sub.code} value={sub.code}>
+                  {sub.name} ({sub.code})
+                </option>
+              ))}
+            </select>
           </div>
         </div>
 
@@ -66,9 +83,9 @@ const CreateSession = ({ onSessionStarted }) => {
 
         <button
           type="submit"
-          disabled={loading}
+          disabled={loading || !subjectCode}
           className={`w-full flex items-center justify-center gap-3 py-4 mt-4 rounded-xl font-bold text-lg transition-all duration-300 shadow-xl
-            ${loading 
+            ${(loading || !subjectCode)
               ? 'bg-slate-200 text-slate-500 cursor-not-allowed' 
               : 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white hover:from-blue-700 hover:to-indigo-700 shadow-blue-500/30 hover:scale-[1.02]'}`}
         >

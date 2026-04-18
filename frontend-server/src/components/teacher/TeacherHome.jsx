@@ -17,7 +17,7 @@ const TeacherHome = ({ onViewChange }) => {
     <div className="space-y-8 animate-fade-in-up">
 
       <Helmet>
-          <title>TeacherDB | Teacher Home Page | SmartPathMaker</title>
+          <title>TeacheDashboard | Teacher Home Page | SmartPathMaker</title>
           <meta name="description" content="Teacher dashboard for managing the teacher's classes and students." />
       </Helmet>
       

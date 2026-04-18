@@ -58,6 +58,7 @@ const ResetPassword = () => {
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] flex items-center justify-center p-4 font-sans text-slate-800">
+      
       <Helmet>
          <title>Create New Password | SmartPathMaker</title>
       </Helmet>

@@ -27,17 +27,42 @@ export const registerUser = async (userData) => {
 };
 
 // ----- 3. Upload Subject Syllabus (Admin Function) ------
-export const uploadSubjectSyllabus = async (subjectId, file) => {
+export const uploadSubjectSyllabus = async (subjectCode, file) => {
   const formData = new FormData();
   formData.append('file', file);
 
   try {
-    const response = await axios.post(`${BASE_API_URL}/api/admin/subject/${subjectId}/upload-syllabus`, formData, {
+    const response = await axios.post(`${BASE_API_URL}/api/admin/subject/${subjectCode}/upload-syllabus`, formData, {
       headers: { 'Content-Type': 'multipart/form-data' }
     });
     return response.data;
   } catch (error) {
     console.error("Failed to upload syllabus", error);
     return { status: "ERROR", message: "Network error during upload." };
+  }
+};
+
+// ----- 4. Create a New Subject -----
+export const createNewSubject = async (subjectData) => {
+  try {
+    const response = await axios.post(`${BASE_API_URL}/api/admin/subject/create`, subjectData);
+    return response.data;
+  } catch (error) {
+    console.error("Failed to create subject", error);
+    return { 
+        status: "ERROR", 
+        message: error.response?.data?.message || "Failed to create subject. Check connection." 
+    };
+  }
+};
+
+// ----- 5. Fetch All Subjects -----
+export const getAllSubjects = async () => {
+  try {
+    const response = await axios.get(`${BASE_API_URL}/api/admin/subjects`);
+    return response.data;
+  } catch (error) {
+    console.error("Failed to fetch subjects", error);
+    return [];
   }
 };

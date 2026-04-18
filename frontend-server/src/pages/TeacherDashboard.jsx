@@ -20,10 +20,13 @@ const TeacherDashboard = () => {
   const [activeSessionId, setActiveSessionId] = useState(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
+
   useEffect(() => {
     const options = { weekday: 'long', month: 'short', day: 'numeric', year: 'numeric' };
     setCurrentDate(new Date().toLocaleDateString('en-US', options).toUpperCase());
   }, []);
+
+
 
   const navItems = [
     { id: 'dashboard', label: 'Dashboard', icon: <FaChalkboardTeacher /> },
@@ -47,7 +50,7 @@ const TeacherDashboard = () => {
         <div>
           <div className="h-20 flex items-center gap-3 px-6 border-b border-slate-800 bg-slate-900/50">
             <div className="min-w-[32px] w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center font-bold text-white shadow-lg shadow-blue-500/30">S</div>
-            <h1 className="text-xl font-black tracking-wider">SALS</h1>
+            <h1 className="text-xl font-black tracking-wider">SmartPathMaker</h1>
           </div>
           <nav className="p-4 space-y-2 mt-4">
             {navItems.map((item) => (

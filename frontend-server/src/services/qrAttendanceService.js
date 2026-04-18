@@ -9,10 +9,10 @@ axios.defaults.withCredentials = true;
 
 const BASE_API_URL = `${import.meta.env.VITE_SPRING_BACKEND_URL}`;
 
-export const startSession = async (subject, batch) => {
+export const startSession = async (subjectCode, batch) => {
   try {
     const response = await axios.post(`${BASE_API_URL}/api/attendance/create-session`, {
-      subject: subject,
+      subjectCode: subjectCode,
       batch: batch
     });
     return response.data; // Returns { sessionId: "DATASTRUCTURES-177..." }
@@ -136,9 +136,9 @@ export const downloadAttendanceCSV = async (sessionId) => {
 
 
 // ----- 10. AI QUIZ ASSESSMENT SERVICE + AI LEARNING PATH SERVICES {payload: { studentId: "12345678", subjectId: "1, 2, 3 ...." }} -----
-export const generateAIQuiz = async (studentId, subjectId) => {
+export const generateAIQuiz = async (studentId, subjectCode) => {
   try {
-    const response = await axios.get(`${BASE_API_URL}/api/ai/quiz/generate/${studentId}/${subjectId}`);
+    const response = await axios.get(`${BASE_API_URL}/api/ai/quiz/generate/${studentId}/${subjectCode}`);
     return response.data;
   } catch (error) {
     console.error("Failed to fetch AI quiz", error);
@@ -148,10 +148,10 @@ export const generateAIQuiz = async (studentId, subjectId) => {
 
 
 // ----- 11. Submit AI Quiz Score {payload: { studentId: "12345678", subjectId: "1, 2, 3 ....", score: 17 }} -----
-export const submitQuizScore = async (studentId, subjectId, score) => {
+export const submitQuizScore = async (studentId, subjectCode, score) => {
   try {
     const response = await axios.post(`${BASE_API_URL}/api/ai/quiz/submit`, 
-      { studentId, subjectId, score },
+      { studentId, subjectCode, score },
     );
     return response.data;
   } catch (error) {
@@ -162,9 +162,9 @@ export const submitQuizScore = async (studentId, subjectId, score) => {
 
 
 // ----- 12. Get Comprehensive AI Learning Path (with personalized resources) {payload: { studentId: "12345678", subjectId: "1, 2, 3 ...." }} -----
-export const getComprehensiveAILearningPath = async (studentId, subjectId) => {
+export const getComprehensiveAILearningPath = async (studentId, subjectCode) => {
   try {
-    const response = await axios.get(`${BASE_API_URL}/api/ai/path/comprehensive/${studentId}/${subjectId}`);
+    const response = await axios.get(`${BASE_API_URL}/api/ai/path/comprehensive/${studentId}/${subjectCode}`);
     return response.data;
   } catch (error) {
     console.error("Failed to generate AI roadmap", error);

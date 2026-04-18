@@ -55,7 +55,7 @@ const AILearningPath = ({ onBack, onNavigateToAssessment }) => {
     <div className="max-w-5xl mx-auto animate-fade-in-up space-y-6">
 
       <Helmet>
-          <title>StudentDB | AI Learning Path | SmartPathMaker</title>
+          <title>StudentDashboard | AI Learning Path | SmartPathMaker</title>
           <meta name="description" content="Generate personalized learning roadmaps with AI assistance." />
       </Helmet>
       
@@ -137,7 +137,7 @@ const AILearningPath = ({ onBack, onNavigateToAssessment }) => {
             
              <div className="mb-8 border-b-2 border-slate-100 pb-6">
                 <h1 className="text-4xl font-black text-slate-800 tracking-tight">{selectedSubject}</h1>
-                <p className="text-slate-500 font-bold mt-2 uppercase tracking-wider">SALS Custom Learning Roadmap</p>
+                <p className="text-slate-500 font-bold mt-2 uppercase tracking-wider">SmartPathMaker Custom Learning Roadmap</p>
              </div>
 
           <div className="prose prose-slate max-w-none 

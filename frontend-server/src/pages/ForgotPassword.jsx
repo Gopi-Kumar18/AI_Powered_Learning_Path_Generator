@@ -40,8 +40,10 @@ const ForgotPassword = () => {
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] flex items-center justify-center p-4 font-sans text-slate-800">
-      <Helmet>
-         <title>Forgot Password | SmartPathMaker</title>
+
+        <Helmet>
+          <title>Forgot Password | SmartPathMaker</title>
+          <meta name="description" content="Take a custom assessment based on your attendance tier." />
       </Helmet>
 
       <div className="bg-white border border-slate-100 p-8 md:p-10 rounded-3xl shadow-xl shadow-slate-200/50 w-full max-w-md">

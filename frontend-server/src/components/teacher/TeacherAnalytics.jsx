@@ -25,7 +25,7 @@ const TeacherAnalytics = ({ onBack }) => {
     <div className="animate-fade-in-up space-y-8">
 
       <Helmet>
-          <title>TeacherDB | Teacher Analytics | SmartPathMaker</title>
+          <title>TeacherDashboard | Teacher Analytics | SmartPathMaker</title>
           <meta name="description" content="Teacher dashboard for managing teacher analytics." />
       </Helmet>
 

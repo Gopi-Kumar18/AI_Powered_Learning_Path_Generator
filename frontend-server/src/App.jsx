@@ -61,7 +61,7 @@ function App() {
             element={
               <ProtectedRoute allowedRole="ADMIN">
                 <AdminDashboard />
-              </ProtectedRoute>
+               </ProtectedRoute>
             } 
           />
 

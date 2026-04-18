@@ -1,6 +1,7 @@
 import { useState } from "react";
 import axios from "axios";
 import { FaSpinner, FaEye, FaEyeSlash, FaCheckCircle, FaExclamationCircle } from "react-icons/fa";
+import { Helmet } from 'react-helmet-async';
 
 const BASE_API_URL = `${import.meta.env.VITE_SPRING_BACKEND_URL}`;
 
@@ -34,8 +35,6 @@ const ChangePassword = () => {
     setErrorMessage("");
 
     try {
-      // Because we set axios.defaults.withCredentials = true in your service files, 
-      // the secure JWT cookie is automatically sent with this request!
       const response = await axios.post(`${BASE_API_URL}/api/auth/change-password`, {
         currentPassword,
         newPassword
@@ -43,11 +42,9 @@ const ChangePassword = () => {
 
       if (response.data.status === "SUCCESS") {
         setStatus("success");
-        // Clear the form
         setCurrentPassword("");
         setNewPassword("");
         setConfirmPassword("");
-        // Reset status to idle after 3 seconds so they see the success message
         setTimeout(() => setStatus("idle"), 3000); 
       } else {
         throw new Error(response.data.message || "Failed to update password.");
@@ -60,6 +57,12 @@ const ChangePassword = () => {
 
   return (
     <div className="bg-white border border-slate-100 p-6 md:p-8 rounded-2xl shadow-sm w-full max-w-md">
+
+      <Helmet>
+          <title>Change Password | SmartPathMaker</title>
+          <meta name="description" content="Take a custom assessment based on your attendance tier." />
+      </Helmet>
+
       <h2 className="text-xl font-bold text-slate-900 mb-2">Change Password</h2>
       <p className="text-slate-500 text-sm mb-6">Update your password to keep your account secure.</p>
 

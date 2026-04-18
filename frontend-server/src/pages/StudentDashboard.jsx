@@ -86,7 +86,7 @@ const StudentDashboard = () => {
       <aside className={`fixed inset-y-0 left-0 z-50 w-64 bg-[#0F172A] text-white transition-transform duration-300 flex flex-col ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"} md:translate-x-0 md:static`}>
         <div className="h-20 flex items-center px-8 border-b border-slate-800">
           <div className="w-8 h-8 bg-blue-600 rounded flex items-center justify-center font-bold mr-3">S</div>
-          <h1 className="text-lg font-bold">SALS</h1>
+          <h1 className="text-lg font-bold">SmartPathMaker</h1>
         </div>
         <nav className="flex-1 px-4 py-6 space-y-2">
           {navItems.map((item) => (

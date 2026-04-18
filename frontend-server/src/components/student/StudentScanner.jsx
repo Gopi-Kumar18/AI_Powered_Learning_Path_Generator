@@ -107,7 +107,7 @@ const StudentScanner = () => {
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
       
       <Helmet>
-         <title>StudentDB | Mark Attendance | SmartPathMaker</title>
+         <title>StudentDashboard | Mark Attendance | SmartPathMaker</title>
           <meta name="description" content="Mark your attendance using the SmartPathMaker system." />
       </Helmet>
 

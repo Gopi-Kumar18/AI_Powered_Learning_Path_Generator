@@ -32,7 +32,7 @@ const SessionHistory = ({ onBack }) => {
     <div className="bg-white border border-slate-200 rounded-3xl p-10 shadow-sm animate-fade-in-up">
 
       <Helmet>
-          <title>TeacherDB | Session History | SmartPathMaker</title>
+          <title>TeacherDashboard | Session History | SmartPathMaker</title>
           <meta name="description" content="Teacher dashboard for managing session history." />
       </Helmet>
 
