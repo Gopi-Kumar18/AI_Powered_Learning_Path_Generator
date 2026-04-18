@@ -41,20 +41,23 @@ public class AILearningService {
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     // ----- 1. Fetch existing path from MongoDB to save API calls -----
-    public LearningPath getLatestPath(String studentId, String subject) {
-        return mongoPathRepo.findTopByStudentIdAndSubjectIgnoreCaseOrderByGeneratedAtDesc(studentId, subject)
+    public LearningPath getLatestPath(String studentId, String subjectCode) {
+        return mongoPathRepo.findTopByStudentIdAndSubjectCodeIgnoreCaseOrderByGeneratedAtDesc(studentId, subjectCode)
                   .orElse(null);
     }
 
     // ----- 2. Generated a new Comprehensive roadmap for an student based on his Attendance + Quiz Results -----
-    public String generateComprehensiveRoadmap(String studentId, Long subjectId) throws Exception {
-        Subject subject = subjectRepo.findById(subjectId).orElseThrow();
-        QuizResult latestQuiz = quizRepo.findTopByStudentIdAndSubjectIdOrderByTakenAtDesc(studentId, subjectId);
+    public String generateComprehensiveRoadmap(String studentId, String subjectCode) throws Exception {
+        Subject subject = subjectRepo.findBySubjectCode(subjectCode).orElseThrow(() -> new RuntimeException("Subject not found for code: " + subjectCode));
+
+        QuizResult latestQuiz = quizRepo.findTopByStudentIdAndSubjectCodeOrderByTakenAtDesc(studentId, subjectCode);
 
         if (latestQuiz == null) throw new RuntimeException("Take the assessment first!");
 
-        int attended = attendanceRepo.countByStudentIdAndSubjectId(studentId, subjectId);
-        long total = sessionRepo.countValidSessionsBySubjectId(subjectId);
+        Long internalId = subject.getId();
+
+        int attended = attendanceRepo.countByStudentIdAndSubjectId(studentId, internalId);
+        long total = sessionRepo.countValidSessionsBySubjectId(internalId);
         double attendancePercent = total == 0 ? 0 : ((double) attended / total) * 100;
 
         String prompt = "You are an expert academic advisor. The student scored " + latestQuiz.getScore() + "/3 on their assessment and has an attendance rate of " + Math.round(attendancePercent) + "%. " +
@@ -70,7 +73,7 @@ public class AILearningService {
 
         LearningPath path = new LearningPath();
         path.setStudentId(studentId);
-        path.setSubject(subject.getName());
+        path.setSubjectCode(subject.getSubjectCode());
         path.setCurrentAttendancePercentage(attendancePercent);
         path.setAiGeneratedRoadmap(finalMarkdown);
         path.setGeneratedAt(java.time.LocalDateTime.now());

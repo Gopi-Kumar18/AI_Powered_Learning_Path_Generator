@@ -14,7 +14,7 @@ public class LearningPath {
 
     private String studentId; // Links back to your MySQL User table!
 
-    private String subject;
+    private String subjectCode;
 
     private double currentAttendancePercentage;
 

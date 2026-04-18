@@ -34,19 +34,21 @@ public class AIQuizService {
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     // ----- 1. Generates a Quiz based on Student's Attendance -----
-    public String generateQuiz(String studentId, Long subjectId) throws Exception {
+    public String generateQuiz(String studentId, String subjectCode) throws Exception {
 
         // 1. Fetch the Subject and check if syllabus exists
-        Subject subject = subjectRepo.findById(subjectId)
-                .orElseThrow(() -> new RuntimeException("Subject not found"));
+        Subject subject = subjectRepo.findBySubjectCode(subjectCode)
+                .orElseThrow(() -> new RuntimeException("Subject not found" + subjectCode));
 
         if (subject.getSyllabusText() == null || subject.getSyllabusText().isEmpty()) {
             throw new RuntimeException("No syllabus uploaded for this subject yet. Please ask your teacher to upload one.");
         }
 
+        Long internalId = subject.getId();
+
         // 2. Calculate Attendance & Difficulty Tier
-        int attended = attendanceRepo.countByStudentIdAndSubjectId(studentId, subjectId);
-        long total = sessionRepo.countValidSessionsBySubjectId(subjectId);
+        int attended = attendanceRepo.countByStudentIdAndSubjectId(studentId, internalId);
+        long total = sessionRepo.countValidSessionsBySubjectId(internalId);
         double percentage = total == 0 ? 0 : ((double) attended / total) * 100;
 
         String difficulty;

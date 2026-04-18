@@ -14,12 +14,12 @@ public class AIQuizController {
     @Autowired private AIQuizService aiQuizService;
 
     // ----- 1. Generates & Return AI based Quiz Questions in JSON String to frontend-----
-    @GetMapping("/quiz/generate/{studentId}/{subjectId}")
+    @GetMapping("/quiz/generate/{studentId}/{subjectCode}")
     public Map<String, Object> generateQuiz(
             @PathVariable String studentId,
-            @PathVariable Long subjectId) {
+            @PathVariable String subjectCode) {
         try {
-            String quizJson = aiQuizService.generateQuiz(studentId, subjectId);
+            String quizJson = aiQuizService.generateQuiz(studentId, subjectCode);
             return Map.of("status", "SUCCESS", "quizData", quizJson);
         } catch (Exception e) {
             return Map.of("status", "ERROR", "message", e.getMessage());

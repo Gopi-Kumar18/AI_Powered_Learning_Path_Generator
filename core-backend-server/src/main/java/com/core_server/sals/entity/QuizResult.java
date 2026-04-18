@@ -13,7 +13,7 @@ public class QuizResult {
     private Long id;
 
     private String studentId;
-    private Long subjectId;
+    private String subjectCode;
     private int score;
     private int totalQuestions = 20;
     private LocalDateTime takenAt = LocalDateTime.now();

@@ -8,6 +8,6 @@ import java.util.Optional;
 public interface LearningPathRepository extends MongoRepository<LearningPath, String> {
 
     // Find the most recent roadmap generated for a specific student and subject
-    Optional<LearningPath> findTopByStudentIdAndSubjectIgnoreCaseOrderByGeneratedAtDesc(String studentId, String subject);
+    Optional<LearningPath> findTopByStudentIdAndSubjectCodeIgnoreCaseOrderByGeneratedAtDesc(String studentId, String subjectCode);
 }
 

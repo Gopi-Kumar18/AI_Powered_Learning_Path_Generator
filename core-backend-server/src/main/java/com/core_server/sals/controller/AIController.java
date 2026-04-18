@@ -11,15 +11,16 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/ai")
+@CrossOrigin(origins = "*")
 public class AIController {
 
     @Autowired private AILearningService aiLearningService;
     @Autowired private QuizResultRepository quizResultRepo;
 
     // ----- 1. Return Already Generated AI Roadmap from MongoDB -----
-    @GetMapping("/path/{studentId}/{subject}")
-    public Map<String, Object> getPath(@PathVariable String studentId, @PathVariable String subject) {
-        LearningPath path = aiLearningService.getLatestPath(studentId, subject);
+    @GetMapping("/path/{studentId}/{subjectCode}")
+    public Map<String, Object> getPath(@PathVariable String studentId, @PathVariable String subjectCode) {
+        LearningPath path = aiLearningService.getLatestPath(studentId, subjectCode);
 
         if (path == null) {
             return Map.of("status", "NOT_FOUND", "message", "No roadmap generated yet.");
@@ -36,10 +37,10 @@ public class AIController {
     }
 
     // ----- 3. Generate Final AI Roadmap for an student based on his Attendance + Quiz Result -----
-    @GetMapping("/path/comprehensive/{studentId}/{subjectId}")
-    public Map<String, Object> getComprehensivePath(@PathVariable String studentId, @PathVariable Long subjectId) {
+    @GetMapping("/path/comprehensive/{studentId}/{subjectCode}")
+    public Map<String, Object> getComprehensivePath(@PathVariable String studentId, @PathVariable String subjectCode) {
         try {
-            String markdownRoadmap = aiLearningService.generateComprehensiveRoadmap(studentId, subjectId);
+            String markdownRoadmap = aiLearningService.generateComprehensiveRoadmap(studentId, subjectCode);
             return Map.of("status", "SUCCESS", "roadmap", markdownRoadmap);
         } catch (Exception e) {
             return Map.of("status", "ERROR", "message", e.getMessage());
