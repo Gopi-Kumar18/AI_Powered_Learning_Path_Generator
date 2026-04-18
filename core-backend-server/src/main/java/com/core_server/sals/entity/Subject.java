@@ -12,9 +12,12 @@ public class Subject {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(unique = true, nullable = false)
+    private String subjectCode; //JAVA2026
+
     private String name; // e.g., "Data Structures"
-    private String code; // e.g., "CS301"
 
     @Column(columnDefinition = "LONGTEXT")
     private String syllabusText;
+
 }

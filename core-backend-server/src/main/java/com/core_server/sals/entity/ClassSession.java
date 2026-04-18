@@ -28,6 +28,8 @@ public class ClassSession {
     @Column(name = "is_valid_schedule")
     private Boolean isValidSchedule = true;
 
+    private String batch;
+
     private String teacherId;
 
     private LocalDateTime startTime;

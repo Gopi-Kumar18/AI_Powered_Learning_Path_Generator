@@ -17,6 +17,8 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.InputStream;
 import java.util.Map;
 import java.util.Optional;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/admin")
@@ -55,14 +57,15 @@ public class AdminController {
     }
 
     // ----- 3. Upload Subjects Syllabus in DB -----
-    @PostMapping(value = "/subject/{subjectId}/upload-syllabus")
+    @PostMapping(value = "/subject/{subjectCode}/upload-syllabus")
     public Map<String, Object> uploadSyllabus(
-            @PathVariable Long subjectId,
+            @PathVariable String subjectCode,
             @RequestParam("file") MultipartFile file) {
 
-        Optional<Subject> subjectOpt = subjectRepository.findById(subjectId);
+        Optional<Subject> subjectOpt = subjectRepository.findBySubjectCode(subjectCode);
+
         if (subjectOpt.isEmpty()) {
-            return Map.of("status", "ERROR", "message", "Subject not found");
+            return Map.of("status", "ERROR", "message", "Subject not found for code: " + subjectCode);
         }
 
         try (InputStream is = file.getInputStream(); PDDocument document = PDDocument.load(is)) {
@@ -71,12 +74,11 @@ public class AdminController {
 
             String cleanText = text.length() > 10000 ? text.substring(0, 10000) : text;
 
-            // Save the raw text to the MySQL database
             Subject subject = subjectOpt.get();
             subject.setSyllabusText(cleanText);
             subjectRepository.save(subject);
 
-            return Map.of("status", "SUCCESS", "message", "Syllabus breaked down and saved to database!");
+            return Map.of("status", "SUCCESS", "message", "Syllabus broken down and saved to database!");
         } catch (Exception e) {
             e.printStackTrace();
             return Map.of("status", "ERROR", "message", "Failed to parse PDF.");
@@ -100,6 +102,45 @@ public class AdminController {
                     "message", "Failed to run audit: " + e.getMessage()
             ));
         }
+    }
+
+    // ----- 5. Create a New Subject (ADMIN ONLY) -----
+    @PostMapping("/subject/create")
+    public Map<String, String> createSubject(@RequestBody Map<String, String> payload) {
+        String subjectCode = payload.get("subjectCode");
+        String name = payload.get("name");
+
+        if (subjectCode == null || name == null || subjectCode.trim().isEmpty() || name.trim().isEmpty()) {
+            return Map.of("status", "ERROR", "message", "Subject Code and Name are required.");
+        }
+
+        String cleanCode = subjectCode.replaceAll("\\s+", "").toUpperCase();
+
+        if (subjectRepository.findBySubjectCode(cleanCode).isPresent()) {
+            return Map.of("status", "ERROR", "message", "Subject Code '" + cleanCode + "' already exists!");
+        }
+
+        Subject newSubject = new Subject();
+        newSubject.setSubjectCode(cleanCode);
+        newSubject.setName(name);
+
+        subjectRepository.save(newSubject);
+
+        return Map.of(
+                "status", "SUCCESS",
+                "message", "Subject '" + name + "' created successfully with code: " + cleanCode
+        );
+    }
+
+    // ----- 6. Get All Subjects  -----
+    @GetMapping("/subjects")
+    public List<Map<String, String>> getAllSubjects() {
+        return subjectRepository.findAll().stream()
+                .map(sub -> Map.of(
+                        "code", sub.getSubjectCode(),
+                        "name", sub.getName()
+                ))
+                .collect(Collectors.toList());
     }
 }
 

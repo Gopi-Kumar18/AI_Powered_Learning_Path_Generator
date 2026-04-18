@@ -36,32 +36,38 @@ public class AttendanceController {
 
     // ----- 1. Timetable -----
     private static final Map<DayOfWeek, List<String>> TIMETABLE = Map.of(
-            DayOfWeek.MONDAY, List.of("OS", "Computer Networks", "Java Programming", "OS Lab"),
-            DayOfWeek.TUESDAY, List.of("OS", "Computer Networks", "Java Programming", "DBMS", "DSA"),
-            DayOfWeek.WEDNESDAY, List.of("OS", "Computer Networks", "Java Programming"),
-            DayOfWeek.THURSDAY, List.of("Java Programming", "DSA", "DSA"),
-            DayOfWeek.FRIDAY, List.of("Verbal Ability", "Computer Networks Lab", "Java Programming"),
+            DayOfWeek.MONDAY, List.of("OS2026", "CN2026", "JAVA2026", "OSLAB2026"),
+            DayOfWeek.TUESDAY, List.of("OS2026", "CN2026", "JAVA2026", "DBMS2026", "DSA2026"),
+            DayOfWeek.WEDNESDAY, List.of("OS2026", "CN2026", "JAVA2026"),
+            DayOfWeek.THURSDAY, List.of("JAVA2026", "DSA2026", "DSA2026"),
+            DayOfWeek.FRIDAY, List.of("PEL2026", "PEL2026", "CNLAB2026"),
 
             // --- TEMPORARY WEEKEND TESTING ---
-            DayOfWeek.SATURDAY, List.of("Java Programming", "DSA", "DBMS", "OS"),
-            DayOfWeek.SUNDAY, List.of("Java Programming", "DSA", "DBMS", "OS")
+            DayOfWeek.SATURDAY, List.of("JAVA2026", "DSA2026", "DBMS2026", "OS2026", "PEL2026", "CN2026", "OSLAB2026"),
+            DayOfWeek.SUNDAY, List.of("JAVA2026", "DSA2026", "DBMS2026", "OS2026", "PEL2026", "CN2026", "OSLAB2026")
     );
 
     // ----- 2. Attendance Session Creation -----
     @PostMapping("/create-session")
     public Map<String, String> createSession(@RequestBody Map<String, String> sessionData) {
-    String subjectName = sessionData.get("subject");
+        String subjectCode = sessionData.get("subjectCode");
+        String batch = sessionData.get("batch");
 
-    Subject subjectEntity = subjectRepository.findByName(subjectName);
-    if (subjectEntity == null) {
-        subjectEntity = new Subject();
-        subjectEntity.setName(subjectName);
-        subjectEntity.setCode(subjectName.substring(0, Math.min(3, subjectName.length())).toUpperCase() + "101");
-        subjectRepository.save(subjectEntity);
-    }
+        Optional<Subject> subjectOpt = subjectRepository.findBySubjectCode(subjectCode);
+
+        if (subjectOpt.isEmpty()) {
+            return Map.of(
+                    "status", "FAIL",
+                    "message", "Invalid Subject Code. Please contact the Administrator to register this subject."
+            );
+        }
+
+        Subject subjectEntity = subjectOpt.get();
+        String subjectName = subjectEntity.getName();
 
     ClassSession session = new ClassSession();
     session.setSubject(subjectEntity);
+    session.setBatch(batch);
     session.setTeacherId("TEACHER-001");
     session.setStartTime(LocalDateTime.now());
     session.setCreatedAt(LocalDateTime.now());
@@ -69,7 +75,9 @@ public class AttendanceController {
 
     DayOfWeek today = LocalDateTime.now().getDayOfWeek();
     List<String> validSubjectsToday = TIMETABLE.getOrDefault(today, List.of());
-    long scheduledCount = validSubjectsToday.stream().filter(s -> s.equalsIgnoreCase(subjectName)).count();
+    long scheduledCount = validSubjectsToday.stream()
+                .filter(s -> s.equalsIgnoreCase(subjectEntity.getSubjectCode()))
+                .count();
 
     if (scheduledCount == 0) {
         // SCENARIO 1: Invalid/Unknown Class (e.g., DBMS on Thursday)
@@ -90,11 +98,11 @@ public class AttendanceController {
         }
     }
 
-    String uniqueId = subjectName.replaceAll("\\s+", "").toUpperCase() + "-" + System.currentTimeMillis();
+    String uniqueId = subjectEntity.getSubjectCode() + "-" + System.currentTimeMillis();
     session.setSessionIdentifier(uniqueId);
     sessionRepository.save(session);
 
-    return Map.of("sessionId", uniqueId, "isMakeup", String.valueOf(session.isMakeup()));
+    return Map.of("status", "SUCCESS","sessionId", uniqueId, "isMakeup", String.valueOf(session.isMakeup()),"message", "Session created successfully for " + subjectName);
 }
 
     // ----- 2. GENERATE QR(token) for every 10sec -----
@@ -128,7 +136,7 @@ public class AttendanceController {
         DayOfWeek today = LocalDateTime.now().getDayOfWeek();
         List<String> validSubjectsToday = TIMETABLE.getOrDefault(today, List.of());
 
-        boolean isScheduledToday = validSubjectsToday.stream().anyMatch(s -> s.equalsIgnoreCase(session.getSubject().getName()));
+        boolean isScheduledToday = validSubjectsToday.stream().anyMatch(s -> s.equalsIgnoreCase(session.getSubject().getSubjectCode()));
 
         // C. No Class present on a specific day
         if (!isScheduledToday && !session.isMakeup()) { return Map.of("status", "REJECTED", "message", "No such class named on this specific day"); }

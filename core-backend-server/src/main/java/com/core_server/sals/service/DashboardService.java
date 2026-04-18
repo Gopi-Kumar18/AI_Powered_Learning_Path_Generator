@@ -37,13 +37,16 @@ public class DashboardService {
         for (Subject sub : subjects) {
             // A. Calculate per subject
             int total = (int) sessionRepo.countValidSessionsBySubjectId(sub.getId());
+
+            if(total == 0) { continue; }
+
             int attended = attendanceRepo.countByStudentIdAndSubjectId(studentId, sub.getId());
 
-            double pct = total == 0 ? 0 : ((double) attended / total) * 100;
+            double pct = ((double) attended / total) * 100;
 
             StudentDashboardDTO.SubjectStat s = new StudentDashboardDTO.SubjectStat();
             s.subjectName = sub.getName();
-            s.subjectCode = sub.getCode();
+            s.subjectCode = sub.getSubjectCode();
             s.attended = attended;
             s.total = total;
             s.percentage = pct;
@@ -79,26 +82,46 @@ public class DashboardService {
 
         stats.classesThisWeek = sessionRepo.countSessionsBetween(startOfWeek, now);
 
-        //  4. Recent Activity (Strictly TODAY, resets at 12:00 AM)
+        // 4. Recent Activity (Last 5 records overall, ignoring midnight resets)
+        List<Attendance> recentLogs = attendanceRepo.findTop5ByStudentIdOrderByTimestampDesc(studentId);
+        stats.recentActivity = new ArrayList<>();
+
+        stats.makeupClassesToday = new ArrayList<>();
+
+        for (Attendance log : recentLogs) {
+            if (log.getSession() != null) {
+                StudentDashboardDTO.ActivityLog act = new StudentDashboardDTO.ActivityLog();
+                act.subjectName = log.getSession().getSubject().getName();
+
+                if (log.getSession().isMakeup()) {
+                    act.status = "makeup_attended";
+                } else {
+                    act.status = "present";
+                }
+
+                act.time = log.getTimestamp().toLocalTime().withSecond(0).withNano(0).toString();
+                act.date = log.getTimestamp().toLocalDate().toString();
+
+                stats.recentActivity.add(act);
+            }
+        }
+
+        // 5. Makeup Classes (Strictly TODAY, resets at 12:00 AM)
         LocalDateTime startOfDay = LocalDateTime.now().with(java.time.LocalTime.MIN);
         LocalDateTime endOfDay = LocalDateTime.now().with(java.time.LocalTime.MAX);
 
         List<Attendance> todaysLogs = attendanceRepo.findByStudentIdAndTimestampBetweenOrderByTimestampDesc(studentId, startOfDay, endOfDay);
-
-        stats.recentActivity = new ArrayList<>();
         stats.makeupClassesToday = new ArrayList<>();
 
         for (Attendance log : todaysLogs) {
-            StudentDashboardDTO.ActivityLog act = new StudentDashboardDTO.ActivityLog();
-            act.subjectName = log.getSession() != null ? log.getSession().getSubject().getName() : "Unknown";
-            act.status = "present";
-            act.time = log.getTimestamp().toLocalTime().toString(); // Shows only time
-            act.date = log.getTimestamp().toLocalDate().toString();
-
             if (log.getSession() != null && log.getSession().isMakeup()) {
+                StudentDashboardDTO.ActivityLog act = new StudentDashboardDTO.ActivityLog();
+                act.subjectName = log.getSession().getSubject().getName();
+                act.status = "present";
+                act.time = log.getTimestamp().toLocalTime().withSecond(0).withNano(0).toString();
+                act.date = log.getTimestamp().toLocalDate().toString();
+
                 stats.makeupClassesToday.add(act);
-            } else {
-                stats.recentActivity.add(act);
             }
         }
 

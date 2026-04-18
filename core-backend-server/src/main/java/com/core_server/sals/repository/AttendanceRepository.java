@@ -42,4 +42,7 @@ public interface AttendanceRepository extends JpaRepository<Attendance, Long> {
     @Query("SELECT a.studentId, COUNT(a.id), MAX(a.timestamp) FROM Attendance a WHERE a.session.teacherId = :teacherId GROUP BY a.studentId")
     List<Object[]> findStudentStatsForTeacher(@Param("teacherId") String teacherId);
 
+    // Method: Fetches the 5 most recent attendance records overall
+    List<Attendance> findTop5ByStudentIdOrderByTimestampDesc(String studentId);
+
 }
