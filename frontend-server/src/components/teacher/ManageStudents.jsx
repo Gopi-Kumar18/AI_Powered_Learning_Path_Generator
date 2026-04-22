@@ -2,20 +2,25 @@ import { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { FaUserGraduate, FaArrowLeft, FaSearch, FaCheckCircle, FaClock } from 'react-icons/fa';
 import { getTeacherStudents } from '../../services/qrAttendanceService';
+import { useAuth } from '../../context/AuthContext';
 
 const ManageStudents = ({ onBack }) => {
+  const { user } = useAuth();
+
   const [students, setStudents] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchStudents = async () => {
-      const data = await getTeacherStudents("TEACHER-001");
+      if (!user || !user.userId) return;
+
+      const data = await getTeacherStudents(user.userId);
       setStudents(data);
       setLoading(false);
     };
     fetchStudents();
-  }, []);
+  }, [user]);
 
   const filteredStudents = students.filter(s => 
     s.studentId.toLowerCase().includes(searchQuery.toLowerCase())

@@ -2,8 +2,11 @@ import { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { FaCalendarAlt, FaUsers, FaArrowLeft, FaEye, FaCheckCircle, FaDownload } from 'react-icons/fa';
 import { getTeacherSessions, getLiveSessionLogs, downloadAttendanceCSV } from '../../services/qrAttendanceService';
+import { useAuth } from '../../context/AuthContext';
 
 const SessionHistory = ({ onBack }) => {
+  const { user } = useAuth();
+
   const [sessions, setSessions] = useState([]);
   const [loading, setLoading] = useState(true);
   
@@ -13,12 +16,14 @@ const SessionHistory = ({ onBack }) => {
 
   useEffect(() => {
     const fetchHistory = async () => {
-      const data = await getTeacherSessions("TEACHER-001");
+      if (!user || !user.userId) return;
+
+      const data = await getTeacherSessions(user.userId);
       setSessions(data);
       setLoading(false);
     };
     fetchHistory();
-  }, []);
+  }, [user]);
 
   const handleViewDetails = async (sessionId) => {
     setSelectedSession(sessionId);

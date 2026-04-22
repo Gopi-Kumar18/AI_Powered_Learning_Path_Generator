@@ -9,11 +9,12 @@ axios.defaults.withCredentials = true;
 
 const BASE_API_URL = `${import.meta.env.VITE_SPRING_BACKEND_URL}`;
 
-export const startSession = async (subjectCode, batch) => {
+export const startSession = async (subjectCode, batch, teacherId) => {
   try {
     const response = await axios.post(`${BASE_API_URL}/api/attendance/create-session`, {
       subjectCode: subjectCode,
-      batch: batch
+      batch: batch,
+      teacherId: teacherId
     });
     return response.data; // Returns { sessionId: "DATASTRUCTURES-177..." }
   } catch (error) {
@@ -181,6 +182,20 @@ export const getAILearningPath = async (studentId, subjectCode) => {
   } catch (error) {
     console.error("Failed to fetch AI path", error);
     return { status: "ERROR" };
+  }
+};
+
+
+// ----- 14. Get's the latest session info conducted -----
+export const getSessionInfoFromToken = async (token) => {
+  try {
+    const response = await axios.get(`${BASE_API_URL}/api/attendance/session-info`, {
+        params: { token }
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching session info:", error);
+    return null;
   }
 };
 

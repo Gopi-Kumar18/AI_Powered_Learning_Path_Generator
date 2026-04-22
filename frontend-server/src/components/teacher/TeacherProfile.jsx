@@ -49,7 +49,7 @@ const TeacherProfile = () => {
               </div>
               <div>
                 <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Email Address</p>
-                <p className="text-lg font-bold text-slate-800">{user?.sub || 'teacher@university.edu'}</p>
+                <p className="text-lg font-bold text-slate-800">{user?.email || 'teacher@spm.edu'}</p>
               </div>
             </div>
             

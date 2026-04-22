@@ -3,19 +3,22 @@ import { Helmet } from 'react-helmet-async';
 import { FaChartLine, FaArrowLeft, FaChalkboardTeacher, FaUsers } from 'react-icons/fa';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, LineChart, Line, CartesianGrid } from 'recharts';
 import { getTeacherAnalytics } from '../../services/qrAttendanceService';
+import { useAuth } from '../../context/AuthContext';
 
 const TeacherAnalytics = ({ onBack }) => {
+  const { user } = useAuth();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchAnalytics = async () => {
-      const result = await getTeacherAnalytics("TEACHER-001");
+      if (!user || !user.userId) return;
+      const result = await getTeacherAnalytics(user.userId);
       setData(result);
       setLoading(false);
     };
     fetchAnalytics();
-  }, []);
+  }, [user]);
 
   if (loading) {
     return <div className="text-center font-bold text-slate-400 py-20 animate-pulse">Gathering Analytics...</div>;

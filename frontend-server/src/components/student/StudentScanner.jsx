@@ -1,10 +1,9 @@
-
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { Scanner } from '@yudiel/react-qr-scanner';
 import Webcam from 'react-webcam'; 
 import { FaMapMarkerAlt, FaCheckCircle, FaTimesCircle, FaCamera, FaSpinner, FaQrcode, FaShieldAlt, FaInfoCircle } from 'react-icons/fa';
-import { markAttendance } from '../../services/qrAttendanceService';
+import { markAttendance, getSessionInfoFromToken } from '../../services/qrAttendanceService';
 import { useAuth } from '../../context/AuthContext';
 
 const StudentScanner = () => {
@@ -14,6 +13,7 @@ const StudentScanner = () => {
   const [message, setMessage] = useState('');
   const [qrToken, setQrToken] = useState(null); 
   const webcamRef = useRef(null); 
+  const [sessionData, setSessionData] = useState(null);
 
   // --- LOCATION LOGIC ---
   useEffect(() => {
@@ -38,20 +38,17 @@ const StudentScanner = () => {
     // 1: Scan, 2: Selfie, 3: Verify
     if (status === 'idle' && stepIndex === 1) return 'active';
     if (status === 'idle' && stepIndex > 1) return 'inactive';
-    
     if ((status === 'camera_switching' || status === 'selfie_mode') && stepIndex === 1) return 'completed';
     if ((status === 'camera_switching' || status === 'selfie_mode') && stepIndex === 2) return 'active';
     if ((status === 'camera_switching' || status === 'selfie_mode') && stepIndex === 3) return 'inactive';
-
     if (status === 'verifying' && stepIndex < 3) return 'completed';
     if (status === 'verifying' && stepIndex === 3) return 'active';
-
     if ((status === 'success' || status === 'rejected') && stepIndex <= 3) return 'completed';
     return 'inactive';
   };
 
   // --- SCAN LOGIC ---
-  const handleScan = (results) => {
+  const handleScan = async (results) => {
     if (results && results.length > 0) {
         const token = results[0].rawValue;
         if (token && status === 'idle') {
@@ -61,6 +58,13 @@ const StudentScanner = () => {
             }
             setQrToken(token); 
             setStatus('camera_switching'); 
+            
+            // NEW: Fetch the real session info instantly using the token!
+            const info = await getSessionInfoFromToken(token);
+            if (info && info.status === 'SUCCESS') {
+                setSessionData(info);
+            }
+
             setTimeout(() => {
                 setStatus('selfie_mode'); 
             }, 1500);
@@ -108,11 +112,9 @@ const StudentScanner = () => {
       
       <Helmet>
          <title>StudentDashboard | Mark Attendance | SmartPathMaker</title>
-          <meta name="description" content="Mark your attendance using the SmartPathMaker system." />
       </Helmet>
 
       <div className="lg:col-span-2 space-y-6">
-         
          {/* 1. HEADER & WARNING */}
          <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
             <h2 className="text-2xl font-bold text-slate-800 mb-2">Mark Attendance</h2>
@@ -144,7 +146,6 @@ const StudentScanner = () => {
                   <div className="w-full max-w-sm relative">
                      <div className="aspect-square bg-gray-900 rounded-xl overflow-hidden relative border border-gray-700">
                         <Scanner onScan={handleScan} />
-                        {/* Overlay */}
                         <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                            <div className="w-56 h-56 border-2 border-blue-500 rounded-lg relative">
                               <div className="absolute top-0 left-0 w-4 h-4 border-t-4 border-l-4 border-blue-500 -mt-1 -ml-1"></div>
@@ -154,9 +155,6 @@ const StudentScanner = () => {
                            </div>
                         </div>
                      </div>
-                     <button className="mt-6 w-full bg-gray-800 text-white py-3 rounded-xl font-medium hover:bg-gray-700 transition flex items-center justify-center gap-2">
-                        <FaQrcode /> Simulate QR Scan
-                     </button>
                   </div>
                )}
 
@@ -164,7 +162,7 @@ const StudentScanner = () => {
                {status === 'camera_switching' && (
                   <div className="text-white flex flex-col items-center animate-pulse">
                      <FaSpinner className="text-5xl mb-4 animate-spin text-blue-500" />
-                     <p>Switching to Selfie Camera...</p>
+                     <p>Decoding QR & Switching to Selfie Camera...</p>
                   </div>
                )}
 
@@ -227,7 +225,7 @@ const StudentScanner = () => {
                         {message}
                      </div>
                      <button 
-                        onClick={() => { setQrToken(null); setStatus('idle'); }}
+                        onClick={() => { setQrToken(null); setSessionData(null); setStatus('idle'); }}
                         className="bg-white text-red-600 px-8 py-3 rounded-xl font-bold hover:bg-gray-100 transition"
                      >
                         Try Again
@@ -239,20 +237,33 @@ const StudentScanner = () => {
          </div>
       </div>
 
-      {/* RIGHT COL: INFO & INSTRUCTIONS */}
+      {/* RIGHT COL: DYNAMIC INFO & INSTRUCTIONS */}
       <div className="space-y-6">
          
          {/* Session Info Card */}
          <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
             <h3 className="font-bold text-slate-800 mb-4 pb-2 border-b border-gray-100">Session Information</h3>
             <div className="space-y-4 text-sm">
-               <InfoRow label="Date" value="Friday, February 27, 2026" />
-               <InfoRow label="Course" value="Database Management Systems" />
-               <InfoRow label="Code" value="CS302" />
-               <InfoRow label="Slot" value="09:00 AM – 10:00 AM" />
-               <InfoRow label="Room" value="Block A · Room 204" />
-               <InfoRow label="Faculty" value="Dr. Priya Sharma" />
-               <div className="flex justify-between pt-2">
+               
+               {/* NEW: DYNAMIC RENDERING! */}
+               {sessionData ? (
+                  <div className="animate-fade-in-up space-y-4">
+                     <InfoRow label="Date" value={sessionData.date} />
+                     <InfoRow label="Course" value={sessionData.subjectName} />
+                     <InfoRow label="Code" value={sessionData.subjectCode} />
+                     <InfoRow label="Batch" value={sessionData.batch} />
+                     <InfoRow label="Time Started" value={sessionData.time} />
+                     <InfoRow label="Faculty" value={sessionData.teacherName} />
+                  </div>
+               ) : (
+                  <div className="flex flex-col items-center justify-center py-10 text-slate-400 text-center">
+                     <FaQrcode className="text-5xl mb-3 opacity-20" />
+                     <p className="italic">Waiting for QR Scan...</p>
+                     <p className="text-xs mt-1">Class details will appear here automatically.</p>
+                  </div>
+               )}
+
+               <div className="flex justify-between pt-2 mt-2 border-t border-gray-100">
                   <span className="text-slate-500">GPS Status</span>
                   <span className={`font-bold ${location ? 'text-green-600' : 'text-red-500'}`}>
                      {location ? 'Locked' : 'Unavailable'}
@@ -301,4 +312,3 @@ const InfoRow = ({ label, value }) => (
 );
 
 export default StudentScanner;
-

@@ -3,8 +3,12 @@ import { Helmet } from 'react-helmet-async';
 import { FaPlay, FaLayerGroup, FaBook } from 'react-icons/fa';
 import { startSession } from '../../services/qrAttendanceService';
 import { getAllSubjects } from '../../services/adminService';
+import { useAuth } from '../../context/AuthContext';
 
 const CreateSession = ({ onSessionStarted }) => {
+
+  const { user } = useAuth();
+
   const [subjectCode, setSubjectCode] = useState('');
   const [batch, setBatch] = useState('');
   const [loading, setLoading] = useState(false);
@@ -22,7 +26,7 @@ const CreateSession = ({ onSessionStarted }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    const data = await startSession(subjectCode, batch);
+    const data = await startSession(subjectCode, batch, user.userId);
     if (data && data.status === "SUCCESS" && data.sessionId) {
         onSessionStarted(data.sessionId); 
     } else {
