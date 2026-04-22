@@ -72,7 +72,8 @@ public class AuthController {
                         "status", "SUCCESS",
                         "role", user.getRole(),
                         "userId", user.getCustomId(),
-                        "name", user.getName()
+                        "name", user.getName(),
+                        "email",user.getEmail()
                 );
             }
         }

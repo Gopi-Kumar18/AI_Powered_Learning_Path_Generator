@@ -7,7 +7,8 @@ import com.core_server.sals.entity.Subject;
 import com.core_server.sals.repository.AttendanceRepository;
 import com.core_server.sals.repository.ClassSessionRepository;
 import com.core_server.sals.repository.SubjectRepository;
-import com.core_server.sals.service.DashboardService;
+import com.core_server.sals.repository.UserRepository;
+import com.core_server.sals.model.User;
 import com.core_server.sals.service.FaceVerificationService;
 import com.core_server.sals.service.GeofencingService;
 import com.core_server.sals.service.QRCodeService;
@@ -33,6 +34,7 @@ public class AttendanceController {
     @Autowired private SubjectRepository subjectRepository;
     @Autowired private GeofencingService geofencingService;
     @Autowired private FaceVerificationService faceService;
+    @Autowired private UserRepository userRepository;
 
     // ----- 1. Timetable -----
     private static final Map<DayOfWeek, List<String>> TIMETABLE = Map.of(
@@ -52,6 +54,7 @@ public class AttendanceController {
     public Map<String, String> createSession(@RequestBody Map<String, String> sessionData) {
         String subjectCode = sessionData.get("subjectCode");
         String batch = sessionData.get("batch");
+        String teacherId = sessionData.get("teacherId");
 
         Optional<Subject> subjectOpt = subjectRepository.findBySubjectCode(subjectCode);
 
@@ -68,7 +71,7 @@ public class AttendanceController {
     ClassSession session = new ClassSession();
     session.setSubject(subjectEntity);
     session.setBatch(batch);
-    session.setTeacherId("TEACHER-001");
+    session.setTeacherId(teacherId != null ? teacherId : "UNKNOWN_TEACHER");
     session.setStartTime(LocalDateTime.now());
     session.setCreatedAt(LocalDateTime.now());
     session.setActive(true);
@@ -158,6 +161,34 @@ public class AttendanceController {
         attendanceRepository.save(record);
 
         return Map.of("status", "SUCCESS", "message", session.isMakeup() ? "Marked Present! (Makeup Class)" : "Marked Present!");
+    }
+
+    // ----- 4. NEW: Fetch Real Session Info from a QR Token -----
+    @GetMapping("/session-info")
+    public Map<String, Object> getSessionInfoFromToken(@RequestParam String token) {
+        if (!qrCodeService.validateToken(token)) {
+            return Map.of("status", "ERROR", "message", "QR code has Expired");
+        }
+
+        String sessionId = qrCodeService.extractSessionId(token);
+        ClassSession session = sessionRepository.findBySessionIdentifier(sessionId);
+        if (session == null) return Map.of("status", "ERROR", "message", "Session not found");
+
+        String teacherName = "Unknown Professor";
+        Optional<User> teacherOpt = userRepository.findByCustomId(session.getTeacherId());
+        if (teacherOpt.isPresent()) {
+            teacherName = teacherOpt.get().getName();
+        }
+
+        return Map.of(
+                "status", "SUCCESS",
+                "subjectName", session.getSubject().getName(),
+                "subjectCode", session.getSubject().getSubjectCode(),
+                "teacherName", teacherName,
+                "batch", session.getBatch(),
+                "time", session.getCreatedAt().toLocalTime().toString().substring(0, 5),
+                "date", session.getCreatedAt().toLocalDate().toString()
+        );
     }
 
 }
