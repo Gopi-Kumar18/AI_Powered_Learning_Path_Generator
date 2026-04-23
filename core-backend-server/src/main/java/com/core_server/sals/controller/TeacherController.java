@@ -2,7 +2,11 @@ package com.core_server.sals.controller;
 
 
 import com.core_server.sals.entity.Attendance;
+import com.core_server.sals.entity.QuizResult;
+import com.core_server.sals.model.User;
 import com.core_server.sals.repository.AttendanceRepository;
+import com.core_server.sals.repository.QuizResultRepository;
+import com.core_server.sals.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -17,6 +21,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.LinkedHashMap;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/teacher")
@@ -24,6 +29,8 @@ public class TeacherController {
 
     @Autowired private AttendanceRepository attendanceRepository;
     @Autowired private ClassSessionRepository classSessionRepository;
+    @Autowired private UserRepository userRepository;
+    @Autowired private QuizResultRepository quizResultRepository;
 
     // ----- 1. API To Fetch Students Attending a Live Running Session -----
     @GetMapping("/session-logs/{sessionIdentifier}")
@@ -71,50 +78,76 @@ public class TeacherController {
     // ----- 3. Fetch TEACHER ANALYTICS DB Stats -----
     @GetMapping("/analytics/{teacherId}")
     public Map<String, Object> getTeacherAnalytics(@PathVariable String teacherId) {
+        // 1. Identify the Teacher and their assigned Subject
+        Optional<User> teacherOpt = userRepository.findByCustomId(teacherId);
+        if (teacherOpt.isEmpty()) return Map.of("error", "Teacher not found");
+
+        String subjectCode = teacherOpt.get().getSubjectCode();
+        String subjectName = "Your Subject";
+
         List<ClassSession> sessions = classSessionRepository.findByTeacherIdOrderByCreatedAtDesc(teacherId);
+
+        if (!sessions.isEmpty() && sessions.get(0).getSubject() != null) {
+            subjectName = sessions.get(0).getSubject().getName();
+            subjectCode = sessions.get(0).getSubject().getSubjectCode();
+        }
 
         int totalSessions = sessions.size();
         long totalPresentOverall = 0;
 
-        Map<String, Integer> subjectSessionCount = new HashMap<>();
-        Map<String, Long> subjectPresentCount = new HashMap<>();
         Map<String, Long> dailyTrend = new LinkedHashMap<>();
+        Map<String, Long> weeklyTrend = new LinkedHashMap<>();
+        Map<String, Long> monthlyTrend = new LinkedHashMap<>();
 
+        String[] daysOfWeek = {"MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY", "SUNDAY"};
+        for (String day : daysOfWeek) weeklyTrend.put(day, 0L);
+
+        // 2. Aggregate Attendance Data
         for (ClassSession s : sessions) {
-            String subject = s.getSubject() != null ? s.getSubject().getName() : "Unknown";
-            String date = s.getCreatedAt().toLocalDate().toString();
-
             long presentCount = attendanceRepository.countBySession_Id(s.getId());
             totalPresentOverall += presentCount;
 
-            subjectSessionCount.put(subject, subjectSessionCount.getOrDefault(subject, 0) + 1);
-            subjectPresentCount.put(subject, subjectPresentCount.getOrDefault(subject, 0L) + presentCount);
+            String date = s.getCreatedAt().toLocalDate().toString();
+            String dayOfWeek = s.getCreatedAt().getDayOfWeek().name();
+            String month = s.getCreatedAt().getMonth().name();
 
             dailyTrend.put(date, dailyTrend.getOrDefault(date, 0L) + presentCount);
+            weeklyTrend.put(dayOfWeek, weeklyTrend.get(dayOfWeek) + presentCount);
+            monthlyTrend.put(month, monthlyTrend.getOrDefault(month, 0L) + presentCount);
         }
 
-        // 1. Format Subject Data for Bar Chart
-        List<Map<String, Object>> subjectData = new ArrayList<>();
-        for (String sub : subjectSessionCount.keySet()) {
-            long totalPres = subjectPresentCount.get(sub);
-            int sessCount = subjectSessionCount.get(sub);
-            subjectData.add(Map.of(
-                    "subject", sub,
-                    "avgStudents", sessCount > 0 ? (totalPres / sessCount) : 0
-            ));
-        }
+        List<Map<String, Object>> dailyData = new ArrayList<>();
+        dailyTrend.forEach((k, v) -> dailyData.add(Map.of("label", k, "attendance", v)));
 
-        // 2. Format Trend Data for Line Chart
-        List<Map<String, Object>> trendData = new ArrayList<>();
-        for (Map.Entry<String, Long> entry : dailyTrend.entrySet()) {
-            trendData.add(Map.of("date", entry.getKey(), "attendance", entry.getValue()));
+        List<Map<String, Object>> weeklyData = new ArrayList<>();
+        weeklyTrend.forEach((k, v) -> weeklyData.add(Map.of("label", k.substring(0, 3), "attendance", v))); // "MON", "TUE"
+
+        List<Map<String, Object>> monthlyData = new ArrayList<>();
+        monthlyTrend.forEach((k, v) -> monthlyData.add(Map.of("label", k.substring(0, 3), "attendance", v))); // "JAN", "FEB"
+
+        // 3. Calculate AI Assessment Marks (Pass > 1 / Fail <= 1 out of 3)
+        long passedCount = 0;
+        long failedCount = 0;
+
+        if (subjectCode != null) {
+            List<QuizResult> quizzes = quizResultRepository.findBySubjectCode(subjectCode);
+            passedCount = quizzes.stream().filter(q -> q.getScore() > 1).count();
+            failedCount = quizzes.stream().filter(q -> q.getScore() <= 1).count();
         }
 
         return Map.of(
+                "subjectName", subjectName,
                 "totalSessions", totalSessions,
                 "totalPresent", totalPresentOverall,
-                "subjectData", subjectData,
-                "trendData", trendData
+                "attendance", Map.of(
+                        "daily", dailyData,
+                        "weekly", weeklyData,
+                        "monthly", monthlyData
+                ),
+                "marks", Map.of(
+                        "passed", passedCount,
+                        "failed", failedCount
+                )
         );
     }
 

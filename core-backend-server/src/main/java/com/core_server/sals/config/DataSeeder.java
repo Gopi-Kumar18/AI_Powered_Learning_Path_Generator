@@ -28,7 +28,8 @@ public class DataSeeder implements CommandLineRunner {
                     "dr.smitch@sals.com",     // Email
                     pe.encode("pass123"), // Password
                     "TEACHER",              // Role
-                    "Dr. Smith"             // Name
+                    "Dr. Smith",
+                    "NOTHING"// Name
             );
             userRepository.save(teacher);
             System.out.println("✅ [SEEDER] Teacher Created: teacher@sals.com / pass123");
@@ -42,7 +43,8 @@ public class DataSeeder implements CommandLineRunner {
                     "student@sals.com",     // Email
                     pe.encode("pass123"), // Password
                     "STUDENT",              // Role
-                    "Gopi Kumar"            // Name
+                    "Gopi Kumar",
+                    "NOTHING"// Name
             );
             userRepository.save(student);
             System.out.println("✅ [SEEDER] Student Created: student@sals.com / pass123");
@@ -56,7 +58,8 @@ public class DataSeeder implements CommandLineRunner {
                     "student1@sals.com",     // Email
                     pe.encode("pass123"), // Password
                     "STUDENT",              // Role
-                    "Mohit Kumar"            // Name
+                    "Mohit Kumar",
+                    "NOTHING"// Name
             );
             userRepository.save(student);
             System.out.println("✅ [SEEDER] Student Created: student@sals.com / pass123");
