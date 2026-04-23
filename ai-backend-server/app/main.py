@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.api import router
+from app.face_service import preload_known_faces
 
 app = FastAPI()
 
@@ -13,11 +14,17 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+@app.on_event("startup")
+def startup_event():
+    print("🚀 AI Server starting...")
+    preload_known_faces()
+    print("✅ Known faces loaded.")
+
 # Register Routes
 app.include_router(router)
 
-@app.get("/")
+@app.get("/health")
 def home():
-    return {"message": "Server is Running"}
+    return {"status": "UP"}
 
 # uvicorn app.main:app --reload --port 8000
