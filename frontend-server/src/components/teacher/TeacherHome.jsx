@@ -26,7 +26,7 @@ const TeacherHome = ({ onViewChange }) => {
         <div className="relative z-10">
           <h1 className="text-4xl font-black mb-2">Welcome back, {user?.name || 'Professor'}! 👋</h1>
           <p className="text-blue-100 text-lg font-medium max-w-xl">
-            Your Smart Attendance Learning System is ready. What would you like to do today?
+             What would you like to do today?
           </p>
         </div>
         {/* Decorative background shapes */}
