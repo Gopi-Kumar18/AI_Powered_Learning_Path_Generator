@@ -83,7 +83,7 @@ public class TeacherController {
         if (teacherOpt.isEmpty()) return Map.of("error", "Teacher not found");
 
         String subjectCode = teacherOpt.get().getSubjectCode();
-        String subjectName = "Your Subject";
+        String subjectName = "Unassigned Subject";
 
         List<ClassSession> sessions = classSessionRepository.findByTeacherIdOrderByCreatedAtDesc(teacherId);
 
