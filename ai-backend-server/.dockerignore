@@ -1,0 +1,24 @@
+# Virtual environments
+venv/
+env/
+
+# Python cache
+__pycache__/
+**/__pycache__/
+*.pyc
+
+# Environment variables and Git
+.env
+.git/
+.gitignore
+.dockerignore
+Dockerfile
+
+# Heavy binaries
+*.whl
+
+# Local testing scripts
+check-image.py
+face_detection_cnt.py
+test_encoding.py
+test_*.py
