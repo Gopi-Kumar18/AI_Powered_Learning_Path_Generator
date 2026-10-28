@@ -1,0 +1,115 @@
+
+
+name: sals-app
+
+x-logging: &default-logging
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "3"
+
+services:
+  frontend:
+    image: ${DOCKERHUB_USER:?set DOCKERHUB_USER}/sals-fe:${IMAGE_TAG:?set IMAGE_TAG}
+    ports:
+      - "80:80"
+    networks:
+      - fe-network
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1/ping || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    logging: *default-logging
+    restart: unless-stopped
+
+  core-backend:
+    image: ${DOCKERHUB_USER}/sals-be:${IMAGE_TAG}
+    env_file: .env
+    environment:
+      # FastAPI is reached by service name over be-network (port not published)
+      AI_SERVER_URL: http://ai-backend:8000/verify-face
+      JAVA_TOOL_OPTIONS: "-XX:MaxRAMPercentage=50"
+    ports:
+      - "8080:8080"
+    networks:
+      - be-network
+      - db-network
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:8080/actuator/health | grep -q UP || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 8
+      start_period: 90s
+    logging: *default-logging
+    restart: unless-stopped
+
+  ai-backend:
+    image: ${DOCKERHUB_USER}/fast-api-backend:${IMAGE_TAG}
+    expose:
+      - "8000"
+    networks:
+      - be-network
+    volumes:
+      # Keeps faces added at runtime across redeploys. On first start Docker fills
+      # the volume from the image's /app/known_faces. REMOVE this volume if the app
+      # never writes to that folder (otherwise new images won't update the faces).
+      - known_faces:/app/known_faces
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health', timeout=3)"]
+      interval: 15s
+      timeout: 5s
+      retries: 8
+      start_period: 90s
+    logging: *default-logging
+    restart: unless-stopped
+
+  # ---------------- LOCAL TESTING ONLY: docker compose --profile localdb up -d ----------------
+  # Throwaway databases on db-network. Not started in AWS (RDS / DocumentDB are used there).
+  mysql:
+    image: mysql:8.4
+    profiles: ["localdb"]
+    environment:
+      MYSQL_DATABASE: sals
+      MYSQL_USER: ${LOCAL_DB_USER:-sals}
+      MYSQL_PASSWORD: ${LOCAL_DB_PASSWORD:-localdev123}
+      MYSQL_ROOT_PASSWORD: ${LOCAL_DB_PASSWORD:-localdev123}
+    expose:
+      - "3306"
+    networks:
+      - db-network
+    volumes:
+      - mysql_data:/var/lib/mysql
+    logging: *default-logging
+    restart: unless-stopped
+
+  mongo:
+    image: mongo:7
+    profiles: ["localdb"]
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${LOCAL_DB_USER:-sals}
+      MONGO_INITDB_ROOT_PASSWORD: ${LOCAL_DB_PASSWORD:-localdev123}
+      MONGO_INITDB_DATABASE: sals
+    expose:
+      - "27017"
+    networks:
+      - db-network
+    volumes:
+      - mongo_data:/data/db
+    logging: *default-logging
+    restart: unless-stopped
+
+networks:
+  fe-network:
+    driver: bridge
+  be-network:
+    driver: bridge
+  db-network:
+    driver: bridge
+    internal: true
+
+volumes:
+  known_faces:
+  mysql_data:
+  mongo_data:
