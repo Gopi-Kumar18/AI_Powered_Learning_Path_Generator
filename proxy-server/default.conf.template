@@ -1,0 +1,49 @@
+# Rendered at container start (nginx image runs envsubst on /etc/nginx/templates).
+# Required env var: APP_HOST (private IP of the app EC2 running the 3 containers)
+
+server {
+    listen 80;
+    server_name _;
+    return 301 https://$host$request_uri;
+}
+
+server {
+    listen 443 ssl;
+    http2 on;
+    server_name _;
+
+    ssl_certificate     /etc/nginx/certs/server.crt;
+    ssl_certificate_key /etc/nginx/certs/server.key;
+    ssl_protocols       TLSv1.2 TLSv1.3;
+
+    client_max_body_size 20m;
+
+    # the Vite bundle is ~2 MB; compress at the edge
+    gzip on;
+    gzip_proxied any;
+    gzip_types text/css application/javascript application/json image/svg+xml;
+
+    # ---- API -> Spring Boot container on the app EC2 (port 8080) ----
+    location /api/ {
+        proxy_pass http://${APP_HOST}:8080;
+        proxy_set_header Host              $host;
+        proxy_set_header X-Real-IP         $remote_addr;
+        proxy_set_header X-Forwarded-For   $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_read_timeout 120s;
+    }
+
+    # ---- End-to-end check: proxy -> Spring -> MySQL/Mongo ----
+    location = /healthz {
+        proxy_pass http://${APP_HOST}:8080/actuator/health;
+        access_log off;
+    }
+
+    # ---- Everything else -> frontend container on the app EC2 (port 80) ----
+    location / {
+        proxy_pass http://${APP_HOST}:80;
+        proxy_set_header Host              $host;
+        proxy_set_header X-Forwarded-For   $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}

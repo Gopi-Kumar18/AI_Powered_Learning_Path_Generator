@@ -1,0 +1,9 @@
+# --- append these lines to the repo's root .gitignore ---
+.env
+*.tfstate
+*.tfstate.*
+*.tfvars
+.terraform/
+.terraform.lock.hcl.bak
+application-local.properties
+*.pem

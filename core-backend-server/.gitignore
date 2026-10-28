@@ -1,40 +1,55 @@
+# Existing project files
 HELP.md
 
-### env.properties ###
+# Environment variables and secrets
 .env
 .env.*
 !.env.example
 
+# Private keys and certificates
+*.pem
+*.key
+*.p12
+*.pfx
 
+# ===============================
+# Maven / Java build output
+# ===============================
 target/
-.mvn/wrapper/maven-wrapper.jar
-!**/src/main/**/target/
-!**/src/test/**/target/
+*.class
 
-### STS ###
-.apt_generated
-.classpath
-.factorypath
-.project
-.settings
-.springBeans
-.sts4-cache
+# Keep Maven Wrapper files and project configuration tracked.
+# Do not ignore pom.xml, mvnw, mvnw.cmd, or .mvn/wrapper/maven-wrapper.properties.
 
-### IntelliJ IDEA ###
-.idea
-*.iws
+# ===============================
+# IDEs
+# ===============================
+.idea/
 *.iml
+*.iws
 *.ipr
-
-### NetBeans ###
-/nbproject/private/
-/nbbuild/
-/dist/
-/nbdist/
-/.nb-gradle/
-build/
-!**/src/main/**/build/
-!**/src/test/**/build/
-
-### VS Code ###
+.classpath
+.project
+.settings/
+.factorypath
+.springBeans
+.sts4-cache/
+.apt_generated/
 .vscode/
+
+# ===============================
+# Other build tools
+# ===============================
+build/
+.gradle/
+.nb-gradle/
+nbproject/private/
+nbbuild/
+dist/
+nbdist/
+
+# ===============================
+# Operating system
+# ===============================
+.DS_Store
+Thumbs.db

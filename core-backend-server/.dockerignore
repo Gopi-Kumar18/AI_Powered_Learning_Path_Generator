@@ -1,0 +1,38 @@
+# ===============================
+# Environment variables and secrets
+# ===============================
+.env
+.env.*
+!.env.example
+
+# ===============================
+# Maven / Java build output
+# ===============================
+target/
+.mvn/wrapper/maven-wrapper.jar
+
+# ===============================
+# IDEs
+# ===============================
+.idea/
+*.iml
+*.iws
+*.ipr
+.classpath
+.project
+.settings/
+.factorypath
+.springBeans
+.sts4-cache/
+.apt_generated/
+.vscode/
+
+# ===============================
+# Other build output
+# ===============================
+build/
+.gradle/
+dist/
+nbbuild/
+nbdist/
+nbproject/private/
