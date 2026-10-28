@@ -1,8 +1,9 @@
 HELP.md
 
-### app.properties ###
-src/main/resources/application.properties
-application.properties
+### env.properties ###
+.env
+.env.*
+!.env.example
 
 
 target/
