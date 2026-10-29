@@ -3,6 +3,7 @@ package com.core_server.sals.config;
 
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -23,6 +24,9 @@ import java.util.List;
 public class SecurityConfig {
 
     @Autowired private JwtFilter jwtFilter;
+
+    @Value("${vite.fe.url}")
+    private String viteFeUrl;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -55,7 +59,8 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
 
-        configuration.setAllowedOrigins(List.of("http://localhost:5173", "https://7fdblmk4-5173.inc1.devtunnels.ms", "https://smartpathmaker.vercel.app")); //Note :- For ""https://ai-smartpathmaker.up.railway.app"" Not needed (server-to-server, no CORS)
+        // vite.fe.url is the deployed frontend origin (proxy EC2 in prod); localhost:5173 stays allowed for local dev.
+        configuration.setAllowedOrigins(List.of(viteFeUrl, "http://localhost:5173"));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
 
         configuration.setAllowedHeaders(List.of("*"));

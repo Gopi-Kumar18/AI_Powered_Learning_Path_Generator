@@ -1,3 +1,5 @@
 /deploy/app/.env
 
 /docs/*
+
+/raw_images/*
