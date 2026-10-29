@@ -1,1 +1,3 @@
 /deploy/app/.env
+
+/docs/*
