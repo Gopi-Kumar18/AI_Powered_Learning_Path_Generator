@@ -52,9 +52,10 @@ services:
     networks:
       - be-network
     volumes:
-      # Keeps faces added at runtime across redeploys. On first start Docker fills
-      # the volume from the image's /app/known_faces. REMOVE this volume if the app
-      # never writes to that folder (otherwise new images won't update the faces).
+      # Confirmed read-only at runtime (preloaded at startup, never written to by
+      # the app) — kept anyway so a new face can be dropped in via SSH without a
+      # rebuild/redeploy. On first start Docker fills the volume from the image's
+      # /app/known_faces.
       - known_faces:/app/known_faces
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health', timeout=3)"]

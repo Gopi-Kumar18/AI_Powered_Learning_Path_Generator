@@ -1,5 +1,19 @@
 /deploy/app/.env
 
-/docs/*
+/docs/codemie/
 
 /raw_images/*
+
+# Terraform: state and plan files hold plaintext DB passwords/outputs, and
+# tfvars holds the owner's IP + SSH public key. .terraform/ is the local
+# provider plugin cache.
+**/.terraform/*
+*.tfstate
+*.tfstate.*
+*.tfvars
+*.tfvars.json
+crash.log
+crash.*.log
+
+*.pem
+application-local.properties
